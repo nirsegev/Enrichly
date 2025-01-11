@@ -3,7 +3,7 @@ import requests
 from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory
 from generate_html import generate_html
-
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -17,11 +17,13 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 
 # Endpoint to handle Telegram Webhook
 @app.route("/webhook", methods=["POST"])
+@app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
 
     if "message" in data:
         chat_id = data["message"]["chat"].get("id")
+        first_name = data["message"]["chat"].get("first_name")  # Extract first name
         text = data["message"].get("text")
 
         if text and text.startswith("http"):
@@ -33,13 +35,11 @@ def webhook():
                 link_metadata[chat_id].append(metadata)
 
             # Generate updated HTML
-            html_link = generate_html(chat_id, user_links, link_metadata)
+            html_link = generate_html(chat_id, user_links, link_metadata, first_name)  
             send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
-
-from bs4 import BeautifulSoup
 
 def analyze_link(link):
     """Fetch and analyze the content of the link, tailored for Amazon product pages."""
