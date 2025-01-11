@@ -62,6 +62,7 @@ def analyze_link(link):
         
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
+            print("Product Data:", product_data)  # Print product data to console
             return {
                 "title": product_data.get("title", "Untitled"),
                 "image": product_data.get("image", "https://via.placeholder.com/150"),
