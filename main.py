@@ -41,47 +41,39 @@ def webhook():
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
 
+import os
+import requests
+
 def analyze_link(link):
-    """Fetch and analyze the content of the link, tailored for Amazon product pages."""
+    """Analyze a link and retrieve structured data using SOAX API scraper."""
+    headers = {
+        'X-SOAX-API-Secret': 'e1c3b3ee-7874-46f7-9af1-c41d44a0b3f0',
+    }
+
+    # Construct the SOAX API request URL
+    api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
+
     try:
-        response = requests.get(link, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        metadata = {"url": link}
-
-        # Extract the canonical URL
-        canonical_link = soup.find("link", {"rel": "canonical"})
-        if canonical_link and canonical_link.get("href"):
-            metadata["canonical_url"] = canonical_link["href"]
-
-        # Extract product title from meta tag or title tag
-        meta_title = soup.find("meta", {"name": "title"})
-        if meta_title and meta_title.get("content"):
-            metadata["title"] = meta_title["content"]
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()  # Raise an error for bad HTTP status codes
+        
+        # Parse the response JSON
+        result = response.json()
+        
+        if result.get("data", {}).get("status") == "done":
+            product_data = result.get("data", {}).get("value", {})
+            return {
+                "title": product_data.get("title", "Untitled"),
+                "image": product_data.get("image", "https://via.placeholder.com/150"),
+                "price": product_data.get("price", "N/A"),
+                "url": product_data.get("url", link)
+            }
         else:
-            metadata["title"] = soup.title.string.strip() if soup.title else "No title found"
+            print("No valid data received from SOAX API.")
+            return None
 
-        # Extract product description
-        meta_description = soup.find("meta", {"name": "description"})
-        if meta_description and meta_description.get("content"):
-            metadata["description"] = meta_description["content"]
-
-        # Example for price (Amazon might dynamically load this in JavaScript, so might require Selenium or similar tools)
-        price_tags = soup.find_all("span", string=lambda s: s and "$" in s)
-        if price_tags:
-            metadata["price"] = price_tags[0].text.strip()
-
-        # Set category if title or description has a product-like structure
-        if metadata.get("price"):
-            metadata["category"] = "Product"
-        else:
-            metadata["category"] = "Unknown"
-
-        return metadata
-
-    except Exception as e:
-        print(f"Error analyzing link: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while analyzing the link: {e}")
         return None
 
 
