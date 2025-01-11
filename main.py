@@ -58,64 +58,64 @@ def generate_html(chat_id):
         os.makedirs(directory)
 
     # Generate a professionally designed HTML page
-    history_html = """
+    history_html = f"""
     <html>
     <head>
         <title>Link History</title>
         <style>
-            body {
+            body {{
                 font-family: Arial, sans-serif;
                 background-color: #f4f7f6;
                 margin: 0;
                 padding: 0;
                 color: #333;
-            }
-            .container {
+            }}
+            .container {{
                 width: 80%;
                 margin: 50px auto;
                 background-color: #fff;
                 padding: 20px;
                 border-radius: 8px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            h1 {
+            }}
+            h1 {{
                 color: #2c3e50;
                 text-align: center;
                 font-size: 36px;
                 margin-bottom: 20px;
-            }
-            h2 {
+            }}
+            h2 {{
                 font-size: 24px;
                 color: #34495e;
                 border-bottom: 2px solid #ecf0f1;
                 padding-bottom: 10px;
                 margin-bottom: 20px;
-            }
-            ul {
+            }}
+            ul {{
                 list-style-type: none;
                 padding: 0;
-            }
-            li {
+            }}
+            li {{
                 background-color: #ecf0f1;
                 margin: 10px 0;
                 padding: 10px;
                 border-radius: 4px;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            }
-            li a {
+            }}
+            li a {{
                 text-decoration: none;
                 color: #2980b9;
                 font-weight: bold;
-            }
-            li a:hover {
+            }}
+            li a:hover {{
                 text-decoration: underline;
-            }
-            footer {
+            }}
+            footer {{
                 text-align: center;
                 font-size: 14px;
                 color: #7f8c8d;
                 margin-top: 30px;
-            }
+            }}
         </style>
     </head>
     <body>
