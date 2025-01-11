@@ -37,46 +37,55 @@ def webhook():
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
 
+from bs4 import BeautifulSoup
+
 def analyze_link(link):
     """Fetch and analyze the content of the link."""
     try:
-        response = requests.get(link, timeout=10)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        response = requests.get(link, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Categorize and extract attributes
-        metadata = {}
-        if soup.title:
-            metadata["title"] = soup.title.string.strip()
-        metadata["url"] = link
+        # Metadata dictionary to store extracted information
+        metadata = {"url": link}
 
-        # Example heuristic: Check for product or article keywords
-        if soup.find("meta", {"name": "description"}):
-            description = soup.find("meta", {"name": "description"}).get("content", "").strip()
-            metadata["description"] = description
+        # Extract product name
+        title = soup.find("span", {"id": "productTitle"})
+        if title:
+            metadata["title"] = title.get_text(strip=True)
 
-        # Try to find price if it’s a product
-        price_tags = soup.find_all(["span", "div"], string=lambda s: s and "$" in s)
-        if price_tags:
-            metadata["price"] = price_tags[0].text.strip()
+        # Extract product price
+        price = soup.find("span", {"id": "priceblock_ourprice"}) or soup.find("span", {"id": "priceblock_dealprice"})
+        if price:
+            metadata["price"] = price.get_text(strip=True)
 
-        # Extract article content if it's an article
-        article_content = soup.find_all("p")
-        if article_content:
-            metadata["content"] = " ".join([p.text for p in article_content[:3]])  # Shortened content for display
+        # Extract product description
+        description = soup.find("div", {"id": "productDescription"})
+        if description:
+            metadata["description"] = description.get_text(strip=True)
 
-        # Assign category (simple example: based on presence of attributes)
-        if "price" in metadata:
-            metadata["category"] = "Product"
-        elif "content" in metadata:
-            metadata["category"] = "Article"
-        else:
-            metadata["category"] = "Unknown"
+        # Extract product rating
+        rating = soup.find("span", {"class": "a-icon-alt"})
+        if rating:
+            metadata["rating"] = rating.get_text(strip=True)
+
+        # Extract product details (e.g., from technical details or features list)
+        details = soup.find("table", {"id": "productDetails_techSpec_section_1"}) or \
+                  soup.find("ul", {"class": "a-unordered-list a-vertical a-spacing-mini"})
+        if details:
+            metadata["details"] = details.get_text(" ", strip=True)
+
+        # Set category
+        metadata["category"] = "Product"
 
         return metadata
     except Exception as e:
         print(f"Error analyzing link: {e}")
         return None
+
 
 
 # Function to generate the HTML page with the link history
