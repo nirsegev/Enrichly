@@ -96,6 +96,16 @@ def set_webhook():
     response = requests.post(url, json={"url": webhook_url})
     return jsonify(response.json())
 
+# Function to send a message back to the user
+def send_message(chat_id, text):
+    url = TELEGRAM_API_URL + "sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text
+    }
+    response = requests.post(url, json=payload)
+    return response.json()
+
 # Serve static HTML files
 @app.route('/storage/links_history/<filename>')
 def serve_file(filename):
