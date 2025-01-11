@@ -15,6 +15,8 @@ link_metadata = defaultdict(list)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your-telegram-bot-token")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 
+X_SOAX_API_Secret = os.getenv("X-SOAX-API-Secret", "your-soax-token")
+
 # Endpoint to handle Telegram Webhook
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -44,7 +46,7 @@ def webhook():
 def analyze_link(link):
     """Analyze a link and retrieve structured product data."""
     headers = {
-        'X-SOAX-API-Secret': 'e1c3b3ee-7874-46f7-9af1-c41d44a0b3f0',
+        'X-SOAX-API-Secret': X_SOAX_API_Secret,
     }
 
     # Construct the SOAX API request URL
