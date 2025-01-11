@@ -67,7 +67,7 @@ def generate_html(chat_id):
 
     # Save the HTML file in the static directory
     filename = f"{chat_id}_history.html"
-    file_path = f"./static/{filename}"
+    file_path = f"/app/storage/links_history/{filename}"
     with open(file_path, "w") as file:
         file.write(history_html)
 
