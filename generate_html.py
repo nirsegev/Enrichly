@@ -31,19 +31,20 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 position: relative;
                 padding-top: 70px; /* Space for logo */
             }}
-           .logo {{
+            .logo {{
                 position: absolute;
                 top: 15px;
                 left: 15px;
                 width: 60px; /* Adjust the size as needed */
                 height: auto;
-                border-radius: 12px; /* Adjust the roundness of the corners */
+                border-radius: 12px; /* Rounded corners */
             }}
             h1 {{
                 color: #2c3e50;
                 text-align: center;
                 font-size: 1.8rem;
                 margin-bottom: 15px;
+                padding-bottom: 50px; /* Added padding between title and sorting buttons */
             }}
             .sort-buttons {{
                 text-align: center;
@@ -73,6 +74,10 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 font-size: 1.2rem;
                 color: #34495e;
                 margin: 0 0 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%; /* Ensure it stays within bounds */
             }}
             .link-card p {{
                 font-size: 0.9rem;
@@ -127,11 +132,13 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     for i, link in enumerate(user_links.get(chat_id, [])):
         metadata = link_metadata.get(chat_id, [])[i] if i < len(link_metadata.get(chat_id, [])) else {}
 
+        # Truncate the title to 100 characters and add ellipsis if longer
+        title = metadata.get('title', 'Untitled')[:100] + ("..." if len(metadata.get('title', '')) > 100 else "")
+
         history_html += f"""
         <div class="link-card" data-index="{i}" data-category="{metadata.get('category', 'Unknown')}">
-            <h2><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h2>
+            <h2><a href="{metadata.get('url', link)}" target="_blank">{title}</a></h2>
             <p><strong>Category:</strong> {metadata.get('category', 'Unknown')}</p>
-            <p><strong>Description:</strong> {metadata.get('description', 'No description available.')}</p>
             {"<p><strong>Price:</strong> $" + metadata['price'] + "</p>" if "price" in metadata else ""}
             {"<p><strong>Content:</strong> " + metadata['content'][:200] + "...</p>" if "content" in metadata else ""}
         </div>
@@ -150,8 +157,4 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     # Save the HTML file
     file_path = os.path.join(directory, f"{chat_id}_history.html")
-    with open(file_path, "w") as file:
-        file.write(history_html)
-
-    # Return the link to the generated HTML page
-    return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+    with open(file_
