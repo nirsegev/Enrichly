@@ -28,6 +28,15 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 padding: 15px;
                 border-radius: 8px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                position: relative;
+                padding-top: 70px; /* Space for logo */
+            }}
+            .logo {{
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                width: 60px; /* Adjust the size as needed */
+                height: auto;
             }}
             h1 {{
                 color: #2c3e50;
@@ -98,26 +107,13 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 }}
             }}
         </style>
-        <script>
-            function sortLinks(criteria) {{
-                const linkCards = Array.from(document.querySelectorAll('.link-card'));
-                const container = document.querySelector('.link-cards-container');
-
-                linkCards.sort((a, b) => {{
-                    if (criteria === 'category') {{
-                        return a.dataset.category.localeCompare(b.dataset.category);
-                    }} else {{
-                        return a.dataset.index - b.dataset.index;
-                    }}
-                }});
-
-                container.innerHTML = '';
-                linkCards.forEach(card => container.appendChild(card));
-            }}
-        </script>
     </head>
     <body>
         <div class="container">
+            <!-- Logo at the top left -->
+            <img src="/static/enrichly_logo.jpg" class="logo" alt="Enrichly Logo">
+
+            <!-- Centered Title -->
             <h1>{first_name}'s Link History</h1>
             <div class="sort-buttons">
                 <button onclick="sortLinks('timeline')">Sort by Timeline</button>
