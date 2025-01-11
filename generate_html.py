@@ -14,7 +14,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{first_name}'s Link History</title>
+        <title>{first_name}'s Bookmarks</title>
         <style>
             body {{
                 margin: 0;
@@ -28,21 +28,14 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }}
 
             .profile {{
-                display: flex;
-                align-items: center;
                 margin-bottom: 16px;
-            }}
-
-            .profile img {{
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                margin-right: 12px;
+                text-align: center;
             }}
 
             .profile h2 {{
                 margin: 0;
-                font-size: 18px;
+                font-size: 24px;
+                color: #2c3e50;
             }}
 
             .search-bar {{
@@ -108,25 +101,11 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 margin-right: 12px;
             }}
 
-            .bottom-nav {{
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                display: flex;
-                justify-content: space-around;
-                background-color: #fff;
-                border-top: 1px solid #ddd;
-                padding: 8px 0;
-            }}
-
-            .bottom-nav .nav-item {{
-                text-align: center;
-            }}
-
-            .bottom-nav .nav-item i {{
-                font-size: 24px;
-                display: block;
+            .bookmarks .bookmark p {{
+                max-width: calc(100% - 52px);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }}
         </style>
     </head>
@@ -134,11 +113,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         <div class="container">
             <!-- Profile -->
             <div class="profile">
-                <img src="https://via.placeholder.com/50" alt="User">
-                <div>
-                    <h2>{first_name}</h2>
-                    <p>{first_name.lower()}@example.com</p>
-                </div>
+                <h2>{first_name}'s Bookmarks</h2>
             </div>
 
             <!-- Search Bar -->
@@ -189,22 +164,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 {generate_bookmarks(chat_id, user_links, link_metadata)}
             </div>
         </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item">
-                <i>🏠</i>
-                <p>Home</p>
-            </div>
-            <div class="nav-item">
-                <i>➕</i>
-                <p>Add</p>
-            </div>
-            <div class="nav-item">
-                <i>⚙️</i>
-                <p>Settings</p>
-            </div>
-        </div>
     </body>
     </html>
     """
@@ -222,8 +181,8 @@ def generate_bookmarks(chat_id, user_links, link_metadata):
     for i, link in enumerate(user_links.get(chat_id, [])):
         metadata = link_metadata.get(chat_id, [])[i] if i < len(link_metadata.get(chat_id, [])) else {}
 
-        # Truncate the title to 100 characters and add ellipsis if longer
-        title = metadata.get('title', 'Untitled')[:100] + ("..." if len(metadata.get('title', '')) > 100 else "")
+        # Truncate the title to 150 characters and add ellipsis if longer
+        title = metadata.get('title', 'Untitled')[:150] + ("..." if len(metadata.get('title', '')) > 150 else "")
 
         bookmarks_html += f"""
         <div class="bookmark">
