@@ -17,7 +17,6 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 
 # Endpoint to handle Telegram Webhook
 @app.route("/webhook", methods=["POST"])
-@app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
 
@@ -54,7 +53,7 @@ def analyze_link(link):
     api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=90)  # Set timeout to 30 seconds
+        response = requests.get(api_url, headers=headers, timeout=110)  # Set timeout to 30 seconds
         response.raise_for_status()  # Raise an error for bad HTTP status codes
         
         # Parse the response JSON
