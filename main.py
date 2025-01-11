@@ -52,33 +52,27 @@ def process_link(chat_id, link, username):
 
 # Function to generate the HTML page with the link history
 def generate_html(chat_id):
-   # Ensure the directory exists
+    # Ensure the directory exists
     directory = "/app/storage/links_history"
     if not os.path.exists(directory):
         os.makedirs(directory)
-    
-    # Save the HTML file
-    file_path = os.path.join(directory, f"{chat_id}_history.html")
-    with open(file_path, "w") as file:
-        file.write(history_html)
-    
-    # Categorize the links (this is a simplified approach)
+
+    # Generate the HTML content
     history_html = "<html><body><h1>Link History</h1>"
     history_html += "<h2>General</h2><ul>"
     
-    for link in user_links[chat_id]:
+    for link in user_links.get(chat_id, []):
         history_html += f"<li>{link}</li>"
     
     history_html += "</ul></body></html>"
 
-    # Save the HTML file in the static directory
-    filename = f"{chat_id}_history.html"
-    file_path = f"/app/storage/links_history/{filename}"
+    # Save the HTML file
+    file_path = os.path.join(directory, f"{chat_id}_history.html")
     with open(file_path, "w") as file:
         file.write(history_html)
 
     # Return the link to the generated HTML page
-    return f"https://flask-production-4c83.up.railway.app/{filename}"
+    return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
 
 # Function to send a message back to the user
 def send_message(chat_id, text):
