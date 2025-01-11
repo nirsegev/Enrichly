@@ -40,9 +40,6 @@ def webhook():
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
 
-import os
-import requests
-
 def analyze_link(link):
     """Analyze a link and retrieve structured data using SOAX API scraper."""
     headers = {
@@ -53,19 +50,22 @@ def analyze_link(link):
     api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
     try:
-        #response = requests.get(api_url, headers=headers, timeout=110)  # Set timeout to 30 seconds
-        response = requests.get('https://scraping.soax.com/v1/request?param=https://www.amazon.com/dp/B07MWSTLY6&function=getProduct&sync=true', headers=headers) 
-        #response.raise_for_status()  # Raise an error for bad HTTP status codes
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()  # Raise an error for bad HTTP status codes
         
         # Parse the response JSON
         result = response.json()
         
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
-            print("Product Data:", product_data)  # Print product data to console
+            images = product_data.get("images", {})
+            
+            # Get the first non-empty image URL
+            product_image = next((url for url in images.values() if url), "https://via.placeholder.com/150")
+
             return {
                 "title": product_data.get("title", "Untitled"),
-                "image": product_data.get("image", "https://via.placeholder.com/150"),
+                "image": product_image,
                 "price": product_data.get("price", "N/A"),
                 "url": product_data.get("url", link)
             }
@@ -76,6 +76,7 @@ def analyze_link(link):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while analyzing the link: {e}")
         return None
+
 
 
 # Endpoint to set Telegram webhook
