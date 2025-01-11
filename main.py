@@ -12,10 +12,13 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
-    
+    print("Received data:", data)  # Print the full incoming data for debugging
+
     if "message" in data:
         chat_id = data["message"]["chat"].get("id")
         text = data["message"].get("text")
+
+        print("Message text:", text)  # Log the text to check what is being received
 
         if text and text.startswith("http"):
             # Process the link
@@ -25,7 +28,7 @@ def webhook():
             send_message(chat_id, "Please send a valid link.")
 
     return jsonify({"status": "ok"}), 200
-
+    
 # Function to process the link and generate a response
 def process_link(chat_id, link):
     # Placeholder for enrichment logic
