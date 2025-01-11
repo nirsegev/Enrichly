@@ -31,12 +31,13 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 position: relative;
                 padding-top: 70px; /* Space for logo */
             }}
-            .logo {{
+           .logo {{
                 position: absolute;
                 top: 15px;
                 left: 15px;
                 width: 60px; /* Adjust the size as needed */
                 height: auto;
+                border-radius: 12px; /* Adjust the roundness of the corners */
             }}
             h1 {{
                 color: #2c3e50;
