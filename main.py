@@ -2,6 +2,8 @@ import os
 import requests
 from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory
+from generate_html import generate_html
+
 
 app = Flask(__name__)
 
