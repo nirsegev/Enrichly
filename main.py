@@ -98,7 +98,7 @@ def set_webhook():
 # Serve static HTML files
 @app.route('/storage/links_history/<filename>')
 def serve_file(filename):
-    return app.send_from_directory('/app/storage/links_history', filename)
+    return send_from_directory('/app/storage/links_history', filename)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
