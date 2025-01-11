@@ -43,11 +43,11 @@ def process_link(chat_id, link, username):
     # Here, you would crawl or categorize the link (this is a placeholder)
     topic = "General"  # Placeholder for AI/crawling categorization
     enriched_data = {
-        "message": f"Hi {username}, thanks for sharing! Here's what we found:",
+        "message": f"Hi {username}, thanks for sharing!",
         "link": link,
         "topic": topic
     }
-    response_message = f"{enriched_data['message']}\n\nOriginal Link: {link}\nTopic: {topic}"
+    response_message = f"{enriched_data['message']}\n\n"
     return response_message
 
 # Function to generate the HTML page with the link history
