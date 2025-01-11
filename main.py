@@ -59,12 +59,11 @@ def analyze_link(link):
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
             images_small = product_data.get("imagesSmall", {})
-            images_large = product_data.get("images", {})
 
-            # Get the first non-empty small image or fallback to a large image, or placeholder
+            # Get the first non-empty image URL from imagesSmall or use a placeholder
             product_image = next(
                 (url for url in images_small.values() if url),
-                next((url for url in images_large.values() if url), "https://via.placeholder.com/150")
+                "https://via.placeholder.com/150"
             )
 
             processed_data = {
@@ -85,7 +84,6 @@ def analyze_link(link):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while analyzing the link: {e}")
         return None
-
 
 
 # Endpoint to set Telegram webhook
