@@ -52,6 +52,10 @@ def process_link(chat_id, link, username):
 
 # Function to generate the HTML page with the link history
 def generate_html(chat_id):
+    # Ensure the static directory exists
+    if not os.path.exists('static'):
+        os.makedirs('static')
+    
     # Categorize the links (this is a simplified approach)
     history_html = "<html><body><h1>Link History</h1>"
     history_html += "<h2>General</h2><ul>"
