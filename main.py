@@ -52,16 +52,20 @@ def analyze_link(link):
     try:
         response = requests.get(api_url, headers=headers)
         response.raise_for_status()  # Raise an error for bad HTTP status codes
-        
+
         # Parse the response JSON
         result = response.json()
-        
+
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
-            images = product_data.get("images", {})
-            
-            # Get the first non-empty image URL
-            product_image = next((url for url in images.values() if url), "https://via.placeholder.com/150")
+            images_small = product_data.get("imagesSmall", {})
+            images_large = product_data.get("images", {})
+
+            # Get the first non-empty small image or fallback to a large image, or placeholder
+            product_image = next(
+                (url for url in images_small.values() if url),
+                next((url for url in images_large.values() if url), "https://via.placeholder.com/150")
+            )
 
             return {
                 "title": product_data.get("title", "Untitled"),
@@ -76,6 +80,7 @@ def analyze_link(link):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while analyzing the link: {e}")
         return None
+
 
 
 
