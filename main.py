@@ -67,12 +67,17 @@ def analyze_link(link):
                 next((url for url in images_large.values() if url), "https://via.placeholder.com/150")
             )
 
-            return {
+            processed_data = {
                 "title": product_data.get("title", "Untitled"),
                 "image": product_image,
                 "price": product_data.get("price", "N/A"),
                 "url": product_data.get("url", link)
             }
+
+            # Print the processed data
+            print("Processed Data:", processed_data)
+
+            return processed_data
         else:
             print("No valid data received from SOAX API.")
             return None
@@ -80,7 +85,6 @@ def analyze_link(link):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while analyzing the link: {e}")
         return None
-
 
 
 
