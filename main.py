@@ -122,7 +122,7 @@ def generate_html(chat_id):
             <h1>Link History for {chat_id}</h1>
             <h2>Shared Links</h2>
             <ul>
-    """.format(chat_id=chat_id)
+    """
 
     for link in user_links.get(chat_id, []):
         history_html += f'<li><a href="{link}" target="_blank">{link}</a></li>'
