@@ -17,23 +17,24 @@ def webhook():
     if "message" in data:
         chat_id = data["message"]["chat"].get("id")
         text = data["message"].get("text")
+        username = data["message"]["chat"].get("username", "User")  # Get the username if available
 
         print("Message text:", text)  # Log the text to check what is being received
 
         if text and text.startswith("http"):
             # Process the link
-            response_message = process_link(chat_id, text)
+            response_message = process_link(chat_id, text, username)
             send_message(chat_id, response_message)
         else:
             send_message(chat_id, "Please send a valid link.")
 
     return jsonify({"status": "ok"}), 200
     
-# Function to process the link and generate a response
-def process_link(chat_id, link):
+# Function to process the link and generate a personalized response
+def process_link(chat_id, link, username):
     # Placeholder for enrichment logic
     enriched_data = {
-        "message": "Thank you for sharing! Here's what we found:",
+        "message": f"Hi {username}, thanks for sharing! Here's what we found:",
         "link": link,
         "suggestions": ["Similar Product A", "Related Article B", "Live Event C"]
     }
