@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 # Store user data (link history)
 user_links = defaultdict(list)
+link_metadata = defaultdict(list)
 
 # Set your Telegram Bot token here
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your-telegram-bot-token")
