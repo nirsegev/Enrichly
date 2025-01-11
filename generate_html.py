@@ -1,7 +1,5 @@
 import os
 
-import os
-
 def generate_html(chat_id, user_links, link_metadata, first_name):
     """Generate a mobile-friendly HTML file with link history and metadata."""
     directory = "/app/storage/links_history"
@@ -41,7 +39,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             .bookmarks {{
                 margin-top: 16px;
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 16px;
             }}
 
@@ -50,49 +48,49 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 border: 1px solid #ddd;
                 border-radius: 8px;
                 padding: 12px;
-                text-align: center;
+                display: flex;
+                align-items: center;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }}
 
-            .gallery {{
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                justify-content: center;
-            }}
-
-            .gallery img {{
+            .bookmark img {{
                 width: 70px;
                 height: 70px;
                 object-fit: cover;
                 border-radius: 4px;
+                margin-right: 12px;
                 border: 1px solid #ddd;
+            }}
+
+            .bookmark-content {{
+                flex: 1;
             }}
 
             .bookmark h3 {{
                 font-size: 1rem;
-                color: #333;
-                margin: 12px 0 8px;
+                color: #3498db;
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: normal;
+            }}
+
+            .bookmark h3 a {{
+                text-decoration: none;
+                color: inherit;
+            }}
+
+            .bookmark h3 a:hover {{
+                text-decoration: underline;
             }}
 
             .bookmark p {{
                 font-size: 0.9rem;
                 color: #555;
-                margin: 0;
-            }}
-
-            .bookmark a {{
-                display: inline-block;
-                margin-top: 8px;
-                padding: 8px 12px;
-                background-color: #3498db;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 4px;
-            }}
-
-            .bookmark a:hover {{
-                background-color: #2980b9;
+                margin: 8px 0 0;
             }}
         </style>
     </head>
@@ -107,16 +105,15 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     for link, metadata in zip(user_links.get(chat_id, []), link_metadata.get(chat_id, [])):
         images = metadata.get("images", ["https://via.placeholder.com/70"])  # Default image if none provided
-        gallery_html = "".join(f'<img src="{img}" alt="Product Image">' for img in images)
+        first_image = images[0] if images else "https://via.placeholder.com/70"
 
         history_html += f"""
         <div class="bookmark">
-            <div class="gallery">
-                {gallery_html}
+            <img src="{first_image}" alt="Product Image">
+            <div class="bookmark-content">
+                <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
+                <p>Price: {metadata.get('price', 'N/A')}</p>
             </div>
-            <h3>{metadata.get('title', 'Untitled')}</h3>
-            <p>Price: {metadata.get('price', 'N/A')}</p>
-            <a href="{metadata.get('url', link)}" target="_blank">View Product</a>
         </div>
         """
 
@@ -132,6 +129,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 
 def generate_bookmarks(chat_id, user_links, link_metadata):
