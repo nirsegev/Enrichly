@@ -2,7 +2,7 @@ import os
 
 import os
 
-def generate_html(chat_id, user_links, link_metadata):
+def generate_html(chat_id, user_links, link_metadata,first_name):
     """Generate a mobile-friendly HTML file with link history and metadata."""
     # Ensure the directory exists
     directory = "/app/storage/links_history"
@@ -13,7 +13,7 @@ def generate_html(chat_id, user_links, link_metadata):
     history_html = f"""
     <html>
     <head>
-        <title>Link History for {chat_id}</title>
+        <title>{first_name} Links History</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body {{
