@@ -17,7 +17,7 @@ def webhook():
     if "message" in data:
         chat_id = data["message"]["chat"].get("id")
         text = data["message"].get("text")
-        username = data["message"]["chat"].get("username", "User")  # Get the username if available
+        username = data["message"]["chat"].get("first_name", "")  # Get the username if available
 
         print("Message text:", text)  # Log the text to check what is being received
 
