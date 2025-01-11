@@ -40,51 +40,48 @@ def webhook():
 from bs4 import BeautifulSoup
 
 def analyze_link(link):
-    """Fetch and analyze the content of the link."""
+    """Fetch and analyze the content of the link, tailored for Amazon product pages."""
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
-        response = requests.get(link, headers=headers, timeout=10)
+        response = requests.get(link, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Metadata dictionary to store extracted information
         metadata = {"url": link}
 
-        # Extract product name
-        title = soup.find("span", {"id": "productTitle"})
-        if title:
-            metadata["title"] = title.get_text(strip=True)
+        # Extract the canonical URL
+        canonical_link = soup.find("link", {"rel": "canonical"})
+        if canonical_link and canonical_link.get("href"):
+            metadata["canonical_url"] = canonical_link["href"]
 
-        # Extract product price
-        price = soup.find("span", {"id": "priceblock_ourprice"}) or soup.find("span", {"id": "priceblock_dealprice"})
-        if price:
-            metadata["price"] = price.get_text(strip=True)
+        # Extract product title from meta tag or title tag
+        meta_title = soup.find("meta", {"name": "title"})
+        if meta_title and meta_title.get("content"):
+            metadata["title"] = meta_title["content"]
+        else:
+            metadata["title"] = soup.title.string.strip() if soup.title else "No title found"
 
         # Extract product description
-        description = soup.find("div", {"id": "productDescription"})
-        if description:
-            metadata["description"] = description.get_text(strip=True)
+        meta_description = soup.find("meta", {"name": "description"})
+        if meta_description and meta_description.get("content"):
+            metadata["description"] = meta_description["content"]
 
-        # Extract product rating
-        rating = soup.find("span", {"class": "a-icon-alt"})
-        if rating:
-            metadata["rating"] = rating.get_text(strip=True)
+        # Example for price (Amazon might dynamically load this in JavaScript, so might require Selenium or similar tools)
+        price_tags = soup.find_all("span", string=lambda s: s and "$" in s)
+        if price_tags:
+            metadata["price"] = price_tags[0].text.strip()
 
-        # Extract product details (e.g., from technical details or features list)
-        details = soup.find("table", {"id": "productDetails_techSpec_section_1"}) or \
-                  soup.find("ul", {"class": "a-unordered-list a-vertical a-spacing-mini"})
-        if details:
-            metadata["details"] = details.get_text(" ", strip=True)
-
-        # Set category
-        metadata["category"] = "Product"
+        # Set category if title or description has a product-like structure
+        if metadata.get("price"):
+            metadata["category"] = "Product"
+        else:
+            metadata["category"] = "Unknown"
 
         return metadata
+
     except Exception as e:
         print(f"Error analyzing link: {e}")
         return None
+
 
 
 
