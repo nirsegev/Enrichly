@@ -9,147 +9,201 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     # Start generating the HTML content
     history_html = f"""
-    <html>
+    <!DOCTYPE html>
+    <html lang="en">
     <head>
-        <title>{first_name}'s Link History</title>
+        <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{first_name}'s Link History</title>
         <style>
             body {{
-                background-color: #f4f7f6;
                 margin: 0;
-                padding: 0;
-                color: #333;
                 font-family: Arial, sans-serif;
+                background-color: #f9f9f9;
+                color: #333;
             }}
+
             .container {{
-                max-width: 600px;
-                margin: 20px auto;
+                padding: 16px;
+            }}
+
+            .profile {{
+                display: flex;
+                align-items: center;
+                margin-bottom: 16px;
+            }}
+
+            .profile img {{
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                margin-right: 12px;
+            }}
+
+            .profile h2 {{
+                margin: 0;
+                font-size: 18px;
+            }}
+
+            .search-bar {{
+                margin: 16px 0;
+            }}
+
+            .search-bar input {{
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }}
+
+            .categories {{
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 16px;
+            }}
+
+            .categories .category {{
+                text-align: center;
+                flex: 1;
+                padding: 8px;
+                margin: 0 4px;
                 background-color: #fff;
-                padding: 15px;
+                border: 1px solid #ddd;
                 border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                position: relative;
-                padding-top: 70px; /* Space for logo */
             }}
-            .logo {{
-                position: absolute;
-                top: 15px;
-                left: 15px;
-                width: 60px; /* Adjust the size as needed */
-                height: auto;
-                border-radius: 12px; /* Rounded corners */
+
+            .collections {{
+                margin-bottom: 16px;
             }}
-            h1 {{
-                color: #2c3e50;
-                text-align: center;
-                font-size: 1.8rem;
-                margin-bottom: 15px;
-                padding-bottom: 50px; /* Added padding between title and sorting buttons */
-            }}
-            .sort-buttons {{
-                text-align: center;
-                margin-bottom: 15px;
-            }}
-            .sort-buttons button {{
-                margin: 5px;
-                padding: 10px 20px;
-                font-size: 1rem;
-                border: none;
+
+            .collections .collection {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px;
+                background-color: #fff;
+                border: 1px solid #ddd;
                 border-radius: 4px;
-                background-color: #3498db;
-                color: white;
-                cursor: pointer;
+                margin-bottom: 8px;
             }}
-            .sort-buttons button:hover {{
-                background-color: #2980b9;
+
+            .bookmarks {{
+                margin-top: 16px;
             }}
-            .link-card {{
-                background-color: #ecf0f1;
-                margin: 15px 0;
-                padding: 10px;
+
+            .bookmarks .bookmark {{
+                display: flex;
+                align-items: center;
+                padding: 8px;
+                background-color: #fff;
+                border: 1px solid #ddd;
                 border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                margin-bottom: 8px;
             }}
-            .link-card h2 {{
-                font-size: 1.2rem;
-                color: #34495e;
-                margin: 0 0 10px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 100%; /* Ensure it stays within bounds */
+
+            .bookmarks .bookmark img {{
+                width: 40px;
+                height: 40px;
+                border-radius: 4px;
+                margin-right: 12px;
             }}
-            .link-card p {{
-                font-size: 0.9rem;
-                color: #7f8c8d;
-                margin: 5px 0;
+
+            .bottom-nav {{
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                display: flex;
+                justify-content: space-around;
+                background-color: #fff;
+                border-top: 1px solid #ddd;
+                padding: 8px 0;
             }}
-            .link-card a {{
-                text-decoration: none;
-                color: #2980b9;
-                font-weight: bold;
-            }}
-            .link-card a:hover {{
-                text-decoration: underline;
-            }}
-            footer {{
+
+            .bottom-nav .nav-item {{
                 text-align: center;
-                font-size: 0.8rem;
-                color: #7f8c8d;
-                margin-top: 20px;
             }}
-            @media (max-width: 768px) {{
-                .container {{
-                    padding: 10px;
-                }}
-                h1 {{
-                    font-size: 1.5rem;
-                }}
-                .link-card {{
-                    padding: 8px;
-                }}
-                .link-card h2 {{
-                    font-size: 1rem;
-                }}
+
+            .bottom-nav .nav-item i {{
+                font-size: 24px;
+                display: block;
             }}
         </style>
     </head>
     <body>
         <div class="container">
-            <!-- Logo at the top left -->
-            <img src="/static/enrichly_logo.jpg" class="logo" alt="Enrichly Logo">
-
-            <!-- Centered Title -->
-            <h1>{first_name}'s Link History</h1>
-            <div class="sort-buttons">
-                <button onclick="sortLinks('timeline')">Sort by Timeline</button>
-                <button onclick="sortLinks('category')">Sort by Category</button>
+            <!-- Profile -->
+            <div class="profile">
+                <img src="https://via.placeholder.com/50" alt="User">
+                <div>
+                    <h2>{first_name}</h2>
+                    <p>{first_name.lower()}@example.com</p>
+                </div>
             </div>
-            <div class="link-cards-container">
-    """
 
-    # Loop through each link and its metadata
-    for i, link in enumerate(user_links.get(chat_id, [])):
-        metadata = link_metadata.get(chat_id, [])[i] if i < len(link_metadata.get(chat_id, [])) else {}
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+            </div>
 
-        # Truncate the title to 100 characters and add ellipsis if longer
-        title = metadata.get('title', 'Untitled')[:100] + ("..." if len(metadata.get('title', '')) > 100 else "")
+            <!-- Categories -->
+            <div class="categories">
+                <div class="category">
+                    <i>🔗</i>
+                    <p>Link</p>
+                </div>
+                <div class="category">
+                    <i>🖼️</i>
+                    <p>Image</p>
+                </div>
+                <div class="category">
+                    <i>📄</i>
+                    <p>Document</p>
+                </div>
+                <div class="category">
+                    <i>🎥</i>
+                    <p>Video</p>
+                </div>
+            </div>
 
-        history_html += f"""
-        <div class="link-card" data-index="{i}" data-category="{metadata.get('category', 'Unknown')}">
-            <h2><a href="{metadata.get('url', link)}" target="_blank">{title}</a></h2>
-            <p><strong>Category:</strong> {metadata.get('category', 'Unknown')}</p>
-            {"<p><strong>Price:</strong> $" + metadata['price'] + "</p>" if "price" in metadata else ""}
-            {"<p><strong>Content:</strong> " + metadata['content'][:200] + "...</p>" if "content" in metadata else ""}
+            <!-- Collections -->
+            <div class="collections">
+                <h3>My Collection</h3>
+                <div class="collection">
+                    <span>Project 1</span>
+                    <span>174 MB</span>
+                </div>
+                <div class="collection">
+                    <span>Download</span>
+                    <span>201 MB</span>
+                </div>
+                <div class="collection">
+                    <span>Explore</span>
+                    <span>133 MB</span>
+                </div>
+            </div>
+
+            <!-- Recent Bookmarks -->
+            <div class="bookmarks">
+                <h3>Recent Bookmarks</h3>
+                {generate_bookmarks(chat_id, user_links, link_metadata)}
+            </div>
         </div>
-        """
 
-    # Add footer and close HTML tags
-    history_html += """
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <i>🏠</i>
+                <p>Home</p>
             </div>
-            <footer>
-                <p>Generated by Enrichly</p>
-            </footer>
+            <div class="nav-item">
+                <i>➕</i>
+                <p>Add</p>
+            </div>
+            <div class="nav-item">
+                <i>⚙️</i>
+                <p>Settings</p>
+            </div>
         </div>
     </body>
     </html>
@@ -162,3 +216,22 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     # Return the link to the generated HTML page
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
+def generate_bookmarks(chat_id, user_links, link_metadata):
+    bookmarks_html = ""
+    for i, link in enumerate(user_links.get(chat_id, [])):
+        metadata = link_metadata.get(chat_id, [])[i] if i < len(link_metadata.get(chat_id, [])) else {}
+
+        # Truncate the title to 100 characters and add ellipsis if longer
+        title = metadata.get('title', 'Untitled')[:100] + ("..." if len(metadata.get('title', '')) > 100 else "")
+
+        bookmarks_html += f"""
+        <div class="bookmark">
+            <img src="https://via.placeholder.com/40" alt="Thumbnail">
+            <div>
+                <p>{title}</p>
+                <small>{metadata.get('category', 'Unknown')} - {metadata.get('url', link)}</small>
+            </div>
+        </div>
+        """
+    return bookmarks_html
