@@ -1,5 +1,7 @@
 import os
 
+import os
+
 def generate_html(chat_id, user_links, link_metadata, first_name):
     """Generate a mobile-friendly HTML file with link history and metadata."""
     directory = "/app/storage/links_history"
@@ -52,10 +54,19 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }}
 
-            .bookmark img {{
-                max-width: 100%;
-                height: auto;
+            .gallery {{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }}
+
+            .gallery img {{
+                width: 70px;
+                height: 70px;
+                object-fit: cover;
                 border-radius: 4px;
+                border: 1px solid #ddd;
             }}
 
             .bookmark h3 {{
@@ -95,9 +106,14 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     """
 
     for link, metadata in zip(user_links.get(chat_id, []), link_metadata.get(chat_id, [])):
+        images = metadata.get("images", ["https://via.placeholder.com/70"])  # Default image if none provided
+        gallery_html = "".join(f'<img src="{img}" alt="Product Image">' for img in images)
+
         history_html += f"""
         <div class="bookmark">
-            <img src="{metadata.get('image', 'https://via.placeholder.com/150')}" alt="{metadata.get('title', 'No Image')}">
+            <div class="gallery">
+                {gallery_html}
+            </div>
             <h3>{metadata.get('title', 'Untitled')}</h3>
             <p>Price: {metadata.get('price', 'N/A')}</p>
             <a href="{metadata.get('url', link)}" target="_blank">View Product</a>
@@ -116,6 +132,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 def generate_bookmarks(chat_id, user_links, link_metadata):
     bookmarks_html = ""
