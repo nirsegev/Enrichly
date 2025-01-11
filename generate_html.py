@@ -157,4 +157,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     # Save the HTML file
     file_path = os.path.join(directory, f"{chat_id}_history.html")
-    with open(file_
+    with open(file_path, "w") as file:
+        file.write(history_html)
+
+    # Return the link to the generated HTML page
+    return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
