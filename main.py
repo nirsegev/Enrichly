@@ -33,7 +33,7 @@ def webhook():
                 link_metadata[chat_id].append(metadata)
 
             # Generate updated HTML
-            html_link = generate_html(chat_id)
+            html_link = generate_html(chat_id, user_links, link_metadata)
             send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
