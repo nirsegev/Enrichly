@@ -16,39 +16,67 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
-    print("Received data:", data)
 
     if "message" in data:
         chat_id = data["message"]["chat"].get("id")
         text = data["message"].get("text")
-        username = data["message"]["chat"].get("first_name", "")
 
         if text and text.startswith("http"):
-            # Process the link
-            response_message = process_link(chat_id, text, username)
-            send_message(chat_id, response_message)
-            # Save link history
             user_links[chat_id].append(text)
-            # Generate and save HTML page with updated history
-            html_link = generate_html(chat_id)
-            send_message(chat_id, f"Here is your updated link history: {html_link}")
 
+            # Fetch and analyze link
+            metadata = analyze_link(text)
+            if metadata:
+                link_metadata[chat_id].append(metadata)
+
+            # Generate updated HTML
+            html_link = generate_html(chat_id)
+            send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
-
     return jsonify({"status": "ok"}), 200
 
-# Function to process the link and generate a personalized response
-def process_link(chat_id, link, username):
-    # Here, you would crawl or categorize the link (this is a placeholder)
-    topic = "General"  # Placeholder for AI/crawling categorization
-    enriched_data = {
-        "message": f"Hi {username}, thanks for sharing!",
-        "link": link,
-        "topic": topic
-    }
-    response_message = f"{enriched_data['message']}\n\n"
-    return response_message
+def analyze_link(link):
+    """Fetch and analyze the content of the link."""
+    try:
+        response = requests.get(link, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Categorize and extract attributes
+        metadata = {}
+        if soup.title:
+            metadata["title"] = soup.title.string.strip()
+        metadata["url"] = link
+
+        # Example heuristic: Check for product or article keywords
+        if soup.find("meta", {"name": "description"}):
+            description = soup.find("meta", {"name": "description"}).get("content", "").strip()
+            metadata["description"] = description
+
+        # Try to find price if it’s a product
+        price_tags = soup.find_all(["span", "div"], string=lambda s: s and "$" in s)
+        if price_tags:
+            metadata["price"] = price_tags[0].text.strip()
+
+        # Extract article content if it's an article
+        article_content = soup.find_all("p")
+        if article_content:
+            metadata["content"] = " ".join([p.text for p in article_content[:3]])  # Shortened content for display
+
+        # Assign category (simple example: based on presence of attributes)
+        if "price" in metadata:
+            metadata["category"] = "Product"
+        elif "content" in metadata:
+            metadata["category"] = "Article"
+        else:
+            metadata["category"] = "Unknown"
+
+        return metadata
+    except Exception as e:
+        print(f"Error analyzing link: {e}")
+        return None
+
 
 # Function to generate the HTML page with the link history
 def generate_html(chat_id):
