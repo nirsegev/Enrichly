@@ -109,7 +109,20 @@ def send_message(chat_id, text):
 # Serve static HTML files
 @app.route('/storage/links_history/<filename>')
 def serve_file(filename):
-    return send_from_directory('/app/storage/links_history', filename)
+    # Serve the HTML content with cache-control headers
+    try:
+        # Read the HTML file content
+        with open(f'/app/storage/links_history/{filename}', 'r') as file:
+            html_content = file.read()
+        
+        # Return the HTML content with cache-control headers
+        return Response(html_content, headers={
+            'Cache-Control': 'no-cache, no-store, must-revalidate',  # Prevent caching
+            'Pragma': 'no-cache',  # HTTP 1.0 compatibility
+            'Expires': '0'  # Ensure it expires immediately
+        })
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
