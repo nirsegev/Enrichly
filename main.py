@@ -40,8 +40,9 @@ def webhook():
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
 
+
 def analyze_link(link):
-    """Analyze a link and retrieve structured data using SOAX API scraper."""
+    """Analyze a link and retrieve structured product data."""
     headers = {
         'X-SOAX-API-Secret': 'e1c3b3ee-7874-46f7-9af1-c41d44a0b3f0',
     }
@@ -58,19 +59,19 @@ def analyze_link(link):
 
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
-            images_small = product_data.get("imagesSmall", {})
+            extras = product_data.get("extras", {})
+            images_small = extras.get("imagesSmall", {})
 
-            # Get the first non-empty image URL from imagesSmall or use a placeholder
-            product_image = next(
-                (url for url in images_small.values() if url),
-                "https://via.placeholder.com/150"
-            )
+            # Extract all valid image URLs from extras.imagesSmall
+            product_images = [
+                url for url in images_small.values() if url.endswith(".jpg")
+            ]
 
             processed_data = {
                 "title": product_data.get("title", "Untitled"),
-                "image": product_image,
+                "images": product_images,
                 "price": product_data.get("price", "N/A"),
-                "url": product_data.get("url", link)
+                "url": product_data.get("url", link),
             }
 
             # Print the processed data
@@ -84,6 +85,7 @@ def analyze_link(link):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred while analyzing the link: {e}")
         return None
+
 
 
 # Endpoint to set Telegram webhook
