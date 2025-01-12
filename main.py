@@ -4,6 +4,7 @@ from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
+from opengraph import OpenGraph
 
 app = Flask(__name__)
 
