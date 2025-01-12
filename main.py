@@ -44,7 +44,7 @@ def webhook():
 
 
 def analyze_link(link):
-    """Analyze a link and retrieve structured product data using SOAX for e-commerce sites or OpenGraph as fallback."""
+    """Analyze a link and retrieve structured product data using SOAX for Amazon links or OpenGraph as fallback."""
     headers_soax = {
         'X-SOAX-API-Secret': X_SOAX_API_Secret,
     }
@@ -58,62 +58,57 @@ def analyze_link(link):
         "Upgrade-Insecure-Requests": "1",
     }
 
-    # Construct the SOAX API request URL
-    api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
+    if "amazon" in link:
+        # Use the SOAX scraping API for Amazon links
+        print("Using SOAX scraping API for Amazon link.")
+        api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
+        try:
+            response = requests.get(api_url, headers=headers_soax, timeout=10)
+            response.raise_for_status()
+
+            # Parse the SOAX response JSON
+            result = response.json()
+            if result.get("data", {}).get("status") == "done":
+                product_data = result.get("data", {}).get("value", {})
+                extras = product_data.get("extras", {})
+                images_small = extras.get("imagesSmall", [])
+
+                # Ensure `images_small` is treated as a list
+                if isinstance(images_small, dict):
+                    images_small = list(images_small.values())
+
+                # Extract all valid image URLs from imagesSmall
+                product_images = [url for url in images_small if isinstance(url, str) and url.endswith(".jpg")]
+
+                processed_data = {
+                    "title": product_data.get("title", "Untitled"),
+                    "images": product_images,
+                    "price": product_data.get("price", "N/A"),
+                    "url": product_data.get("url", link),
+                }
+
+                print("Processed Data from SOAX (Amazon):", processed_data)
+                return processed_data
+
+        except requests.exceptions.RequestException as e:
+            print(f"SOAX API error: {e}")
+
+    # Fallback for non-Amazon links using SOAX unblocker
     try:
-        # Try SOAX API for e-commerce-specific data
-        response = requests.get(api_url, headers=headers_soax, timeout=10)
-        response.raise_for_status()
-
-        # Parse the SOAX response JSON
-        result = response.json()
-        if result.get("data", {}).get("status") == "done":
-            product_data = result.get("data", {}).get("value", {})
-            extras = product_data.get("extras", {})
-            images_small = extras.get("imagesSmall", [])
-
-            # Ensure `images_small` is treated as a list
-            if isinstance(images_small, dict):
-                # If it's a dictionary, extract values
-                images_small = list(images_small.values())
-
-            # Extract all valid image URLs from imagesSmall
-            product_images = [url for url in images_small if isinstance(url, str) and url.endswith(".jpg")]
-
-            processed_data = {
-                "title": product_data.get("title", "Untitled"),
-                "images": product_images,
-                "price": product_data.get("price", "N/A"),
-                "url": product_data.get("url", link),
-            }
-
-            print("Processed Data from SOAX:", processed_data)
-            return processed_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"SOAX API error: {e}")
-
-    # Fallback to OpenGraph metadata extraction
-    try:
+        print("Using SOAX unblocker API for non-Amazon link.")
         soax_unblocker_link = f"https://scraping.soax.com/v1/unblocker/html?xhr=false&url={link}"
-         # Fetch the response with streaming enabled
-        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=60, stream=True)
+        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=60)
         response.raise_for_status()
-    
-        # Read only the first 1024 bytes
-        first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
-        print(f"First 1024 bytes of the response:\n{first_kb[:512]}...")  # Log the first part of the first KB for debugging
-    
-        # Log the response size (based on the fetched portion)
-        print(f"Fetched response size: {len(first_kb)} bytes")
-    
-        # Parse the first KB with BeautifulSoup
-        soup = BeautifulSoup(first_kb, "html.parser")
 
-        print("Starting soup parsing")
-    
-         # Extract Open Graph tags
+        # Log response size
+        response_size = len(response.content)
+        print(f"Response content size: {response_size} bytes")
+
+        # Parse the response content with BeautifulSoup
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Extract OpenGraph tags
         title_tag = soup.find("meta", property="og:title")
         url_tag = soup.find("meta", property="og:url")
         description_tag = soup.find("meta", property="og:description")
@@ -146,6 +141,7 @@ def analyze_link(link):
         "url": link,
         "description": "",
     }
+
 
 
 # Endpoint to set Telegram webhook
