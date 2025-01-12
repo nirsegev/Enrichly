@@ -110,37 +110,23 @@ def analyze_link(link):
         print("Starting soup parsing")
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Count and display the number of "meta" tags found
-        meta_tags = soup.find_all("meta")
-        print(f"Number of meta tags found: {len(meta_tags)}")
+         # Extract Open Graph tags
+        title_tag = soup.find("meta", property="og:title")
+        url_tag = soup.find("meta", property="og:url")
+        description_tag = soup.find("meta", property="og:description")
+        image_tag = soup.find("meta", property="og:image")
+        site_name_tag = soup.find("meta", property="og:site_name")
 
-        # Data holder for OpenGraph metadata
+        # Extract content or provide defaults
         data = {
-            "title": link,
-            "description": "",
-            "url": link,
-            "images": [],
-            "site_name": "Unknown",
-            "locale": None,
+            "title": title_tag["content"] if title_tag and title_tag.get("content") else "No title found",
+            "description": description_tag["content"] if description_tag and description_tag.get("content") else "No description found",
+            "url": url_tag["content"] if url_tag and url_tag.get("content") else link,
+            "images": [image_tag["content"]] if image_tag and image_tag.get("content") else [],
+            "site_name": site_name_tag["content"] if site_name_tag and site_name_tag.get("content") else "Unknown site name",
         }
 
-        # Extract OpenGraph meta tags
-        for tag in meta_tags:
-            if tag.get("property") == "og:title":
-                data["title"] = tag.get("content", data["title"])
-            if tag.get("property") == "og:description":
-                data["description"] = tag.get("content", data["description"])
-            if tag.get("property") == "og:url":
-                data["url"] = tag.get("content", data["url"])
-            if tag.get("property") == "og:image":
-                image = tag.get("content", None)
-                if image:
-                    data["images"].append(image)
-            if tag.get("property") == "og:site_name":
-                data["site_name"] = tag.get("content", data["site_name"])
-            if tag.get("property") == "og:locale":
-                data["locale"] = tag.get("content", data["locale"])
-
+        # Debugging extracted data
         print("Extracted OpenGraph Data:", data)
         return data
 
