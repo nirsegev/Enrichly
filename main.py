@@ -112,10 +112,7 @@ def analyze_link(link):
         soup = BeautifulSoup(first_kb, "html.parser")
 
         print("Starting soup parsing")
-        response_text = response.text
-        #print(response_text)
-        soup = BeautifulSoup(response_text, "html.parser")
-
+    
          # Extract Open Graph tags
         title_tag = soup.find("meta", property="og:title")
         url_tag = soup.find("meta", property="og:url")
