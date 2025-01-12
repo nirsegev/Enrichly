@@ -108,7 +108,7 @@ def analyze_link(link):
         #first_bytes = response.raw.read(4096, decode_content=True).decode("utf-8", errors="ignore")
         
         # Parse the response content with BeautifulSoup
-        soup = BeautifulSoup(response, "html.parser")
+        soup = BeautifulSoup(response.text, "html.parser")
 
         # Extract OpenGraph tags
         title_tag = soup.find("meta", property="og:title")
