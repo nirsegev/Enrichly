@@ -45,16 +45,27 @@ def webhook():
 
 def analyze_link(link):
     """Analyze a link and retrieve structured product data using SOAX for e-commerce sites or OpenGraph as fallback."""
-    headers = {
+    headers_soax = {
         'X-SOAX-API-Secret': X_SOAX_API_Secret,
     }
+
+    headers_general = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "DNT": "1",  # Do Not Track
+        "Upgrade-Insecure-Requests": "1",
+    }
+    
+    
 
     # Construct the SOAX API request URL
     api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
     try:
         # Try SOAX API for e-commerce-specific data
-        response = requests.get(api_url, headers=headers, timeout=10)
+        response = requests.get(api_url, headers=headers_soax, timeout=10)
         response.raise_for_status()
 
         # Parse the SOAX response JSON
@@ -85,7 +96,7 @@ def analyze_link(link):
 
     # Fallback to OpenGraph metadata extraction
     try:
-        response = requests.get(link, timeout=10)
+        response = requests.get(link, headers=headers_general, timeout=10)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
