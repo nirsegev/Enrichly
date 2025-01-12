@@ -88,13 +88,12 @@ def analyze_link(link):
         response = requests.get(link, timeout=10)
         response.raise_for_status()
 
-        # Parse the HTML using BeautifulSoup
-        og_title = soup.find("meta", property="og:title")["content"]
-        og_description = soup.find("meta", property="og:description")["content"]
-        og_url = soup.find("meta", property="og:url")["content"]
-        og_image = soup.find("meta", property="og:image")["content"]
-        og_site_name = soup.find("meta", property="og:site_name")["content"]
-
+         # Parse the HTML using BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        og_title = soup.find("meta", property="og:title")
+        og_description = soup.find("meta", property="og:description")
+        og_image = soup.find("meta", property="og:image")
+        og_url = soup.find("meta", property="og:url")
         processed_data = {
             "title": og_title['content'] if og_title else "Untitled",
             "images": [og_image['content']] if og_image else [],
