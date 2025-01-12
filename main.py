@@ -88,18 +88,19 @@ def analyze_link(link):
         response = requests.get(link, timeout=10)
         response.raise_for_status()
 
-         # Parse the HTML using BeautifulSoup
-        soup = BeautifulSoup(response.text, 'html.parser')
-        og_title = soup.find("meta", property="og:title")
-        og_description = soup.find("meta", property="og:description")
-        og_image = soup.find("meta", property="og:image")
-        og_url = soup.find("meta", property="og:url")
+        og_data = {}
+        for meta in soup.find_all("meta"):
+            if meta.get("property", "").startswith("og:") or meta.get("name", "").startswith("twitter:"):
+                key = meta.get("property") or meta.get("name")
+                og_data[key] = meta.get("content", "").strip()
+
+        # Default fallback values
         processed_data = {
-            "title": og_title['content'] if og_title else "Untitled",
-            "images": [og_image['content']] if og_image else [],
-            "price": "N/A",  # OpenGraph doesn't provide price data
-            "url": og_url['content'] if og_url else link,
-            "description": og_description['content'] if og_description else "",
+            "title": og_data.get("og:title") or og_data.get("twitter:title") or soup.title.string.strip(),
+            "description": og_data.get("og:description") or og_data.get("twitter:description") or "",
+            "url": og_data.get("og:url") or link,
+            "images": og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150" or [],
+            "site_name": og_data.get("og:site_name", "Unknown"),
         }
 
         print("Processed Data from OpenGraph:", processed_data)
