@@ -97,16 +97,19 @@ def analyze_link(link):
     # Fallback to OpenGraph metadata extraction
     try:
         soax_unblocker_link = f"https://scraping.soax.com/v1/unblocker/html?xhr=false&url={link}"
-        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=60)
-        
-        # Log response size
-        response_size = len(response.content)
-        print(f"Response content size: {response_size} bytes")
-        
-        #response.raise_for_status()
-
-        # Read only the first 1024 bytes of the response
-        #first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
+         # Fetch the response with streaming enabled
+        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=60, stream=True)
+        response.raise_for_status()
+    
+        # Read only the first 1024 bytes
+        first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
+        print(f"First 1024 bytes of the response:\n{first_kb[:512]}...")  # Log the first part of the first KB for debugging
+    
+        # Log the response size (based on the fetched portion)
+        print(f"Fetched response size: {len(first_kb)} bytes")
+    
+        # Parse the first KB with BeautifulSoup
+        soup = BeautifulSoup(first_kb, "html.parser")
 
         print("Starting soup parsing")
         response_text = response.text
