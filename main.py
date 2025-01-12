@@ -100,6 +100,7 @@ def analyze_link(link):
 
     # Fallback to OpenGraph metadata extraction
      # Parse the HTML content using BeautifulSoup
+    print (f"starting soup parsing")
     soup = BeautifulSoup(response.text, "html.parser")
     
     # Data holder for OpenGraph metadata
@@ -114,6 +115,7 @@ def analyze_link(link):
     
     # Extract OpenGraph meta tags
     for tag in soup.find_all("meta"):
+        print (f"found soup meta tags")
         if tag.get("property") == "og:title":
             data["title"] = tag.get("content", data["title"])
         if tag.get("property") == "og:description":
@@ -133,6 +135,7 @@ def analyze_link(link):
         if not data["images"]:
             data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
 
+        print (data)
         return data
 
 
