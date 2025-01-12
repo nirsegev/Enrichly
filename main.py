@@ -100,34 +100,23 @@ def analyze_link(link):
 
     # Fallback to OpenGraph metadata extraction
     try:
-        response = requests.get(link, headers=headers_general, timeout=10)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        og_data = {}
-        for meta in soup.find_all("meta"):
-            if meta.get("property", "").startswith("og:") or meta.get("name", "").startswith("twitter:"):
-                key = meta.get("property") or meta.get("name")
-                og_data[key] = meta.get("content", "").strip()
+        og = OpenGraph(url=link)
+        if og.is_valid():
+            # Ensure `images` is always a list
+            images = og.get("image")
+            if not isinstance(images, list):
+                images = [images] if images else []
 
-        # Default fallback values
-        processed_data = {
-            "title": og_data.get("og:title") or og_data.get("twitter:title") or soup.title.string.strip(),
-            "description": og_data.get("og:description") or og_data.get("twitter:description") or "",
-            "url": og_data.get("og:url") or link,
-            "images": [og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150"]
-            if isinstance(og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150", str)
-            else og_data.get("og:image") or og_data.get("twitter:image") or [],
-            "site_name": og_data.get("og:site_name", "Unknown"),
-        }
-
-        print("Processed Data from OpenGraph:", processed_data)
-        return processed_data
-
-    except requests.exceptions.RequestException as e:
-        print(f"OpenGraph extraction error: {e}")
+            return {
+                "title": og.get("title", "Untitled"),
+                "description": og.get("description", ""),
+                "url": og.get("url", link),
+                "images": images,
+                "site_name": og.get("site_name", "Unknown"),
+            }
     except Exception as e:
-        print(f"Error parsing OpenGraph metadata: {e}")
+        print(f"OpenGraph extraction error: {e}")
+
 
     # Return minimal data if both SOAX and OpenGraph fail
     return {
