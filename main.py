@@ -44,7 +44,7 @@ def webhook():
 
 
 def analyze_link(link):
-    """Analyze a link and retrieve structured product data."""
+    """Analyze a link and retrieve structured product data using SOAX for e-commerce sites or OpenGraph as fallback."""
     headers = {
         'X-SOAX-API-Secret': X_SOAX_API_Secret,
     }
@@ -53,12 +53,12 @@ def analyze_link(link):
     api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
     try:
-        response = requests.get(api_url, headers=headers)
-        response.raise_for_status()  # Raise an error for bad HTTP status codes
+        # Try SOAX API for e-commerce-specific data
+        response = requests.get(api_url, headers=headers, timeout=10)
+        response.raise_for_status()
 
-        # Parse the response JSON
+        # Parse the SOAX response JSON
         result = response.json()
-
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
             extras = product_data.get("extras", {})
@@ -74,19 +74,52 @@ def analyze_link(link):
                 "images": product_images,
                 "price": product_data.get("price", "N/A"),
                 "url": product_data.get("url", link),
+                "description": product_data.get("description", ""),
             }
 
-            # Print the processed data
-            print("Processed Data:", processed_data)
-
+            print("Processed Data from SOAX:", processed_data)
             return processed_data
-        else:
-            print("No valid data received from SOAX API.")
-            return None
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred while analyzing the link: {e}")
-        return None
+        print(f"SOAX API error: {e}")
+
+    # Fallback to OpenGraph metadata extraction
+    try:
+        response = requests.get(link, timeout=10)
+        response.raise_for_status()
+
+        # Parse the HTML using BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        og_title = soup.find("meta", property="og:title")
+        og_description = soup.find("meta", property="og:description")
+        og_image = soup.find("meta", property="og:image")
+        og_url = soup.find("meta", property="og:url")
+
+        processed_data = {
+            "title": og_title['content'] if og_title else "Untitled",
+            "images": [og_image['content']] if og_image else [],
+            "price": "N/A",  # OpenGraph doesn't provide price data
+            "url": og_url['content'] if og_url else link,
+            "description": og_description['content'] if og_description else "",
+        }
+
+        print("Processed Data from OpenGraph:", processed_data)
+        return processed_data
+
+    except requests.exceptions.RequestException as e:
+        print(f"OpenGraph extraction error: {e}")
+    except Exception as e:
+        print(f"Error parsing OpenGraph metadata: {e}")
+
+    # Return minimal data if both SOAX and OpenGraph fail
+    return {
+        "title": "Untitled",
+        "images": [],
+        "price": "N/A",
+        "url": link,
+        "description": "",
+    }
+
 
 
 
