@@ -97,7 +97,7 @@ def analyze_link(link):
     # Fallback to OpenGraph metadata extraction
     try:
         soax_unblocker_link = f"https://scraping.soax.com/v1/unblocker/html?xhr=false&url={link}"
-        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=10)
+        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=60)
         
         # Log response size
         response_size = len(response.content)
@@ -110,7 +110,7 @@ def analyze_link(link):
 
         print("Starting soup parsing")
         response_text = response.text
-        print(response_text)
+        #print(response_text)
         soup = BeautifulSoup(response_text, "html.parser")
 
          # Extract Open Graph tags
