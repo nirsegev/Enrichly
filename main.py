@@ -57,8 +57,6 @@ def analyze_link(link):
         "DNT": "1",  # Do Not Track
         "Upgrade-Insecure-Requests": "1",
     }
-    
-    
 
     # Construct the SOAX API request URL
     api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
@@ -74,23 +72,21 @@ def analyze_link(link):
             product_data = result.get("data", {}).get("value", {})
             extras = product_data.get("extras", {})
             images_small = extras.get("imagesSmall", [])
-        
+
             # Ensure `images_small` is treated as a list
             if isinstance(images_small, dict):
                 # If it's a dictionary, extract values
                 images_small = list(images_small.values())
-        
+
             # Extract all valid image URLs from imagesSmall
             product_images = [url for url in images_small if isinstance(url, str) and url.endswith(".jpg")]
-        
+
             processed_data = {
                 "title": product_data.get("title", "Untitled"),
                 "images": product_images,
                 "price": product_data.get("price", "N/A"),
-            "url": product_data.get("url", link),
-                # "description": product_data.get("description", ""),
+                "url": product_data.get("url", link),
             }
-
 
             print("Processed Data from SOAX:", processed_data)
             return processed_data
@@ -99,13 +95,12 @@ def analyze_link(link):
         print(f"SOAX API error: {e}")
 
     # Fallback to OpenGraph metadata extraction
-     # Parse the HTML content using BeautifulSoup
-     try:
-        response = requests.get(link, timeout=10)
+    try:
+        response = requests.get(link, headers=headers_general, timeout=10)
         response.raise_for_status()
-        print (f"starting soup parsing")
+        print("Starting soup parsing")
         soup = BeautifulSoup(response.text, "html.parser")
-        
+
         # Data holder for OpenGraph metadata
         data = {
             "title": "Untitled",
@@ -115,10 +110,9 @@ def analyze_link(link):
             "site_name": "Unknown",
             "locale": None,
         }
-        
+
         # Extract OpenGraph meta tags
         for tag in soup.find_all("meta"):
-            print (f"found soup meta tags")
             if tag.get("property") == "og:title":
                 data["title"] = tag.get("content", data["title"])
             if tag.get("property") == "og:description":
@@ -133,14 +127,14 @@ def analyze_link(link):
                 data["site_name"] = tag.get("content", data["site_name"])
             if tag.get("property") == "og:locale":
                 data["locale"] = tag.get("content", data["locale"])
-    
-            # Ensure 'images' is always a list, even if no images found
-            if not data["images"]:
-                data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
-    
-            print (data)
-            return data
-    
+
+        # Ensure 'images' is always a list, even if no images found
+        if not data["images"]:
+            data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
+
+        print(data)
+        return data
+
     except requests.exceptions.RequestException as e:
         print(f"OpenGraph extraction error: {e}")
     except Exception as e:
@@ -154,8 +148,6 @@ def analyze_link(link):
         "url": link,
         "description": "",
     }
-
-
 
 
 # Endpoint to set Telegram webhook
