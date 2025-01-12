@@ -73,20 +73,24 @@ def analyze_link(link):
         if result.get("data", {}).get("status") == "done":
             product_data = result.get("data", {}).get("value", {})
             extras = product_data.get("extras", {})
-            images_small = extras.get("imagesSmall", {})
-
-            # Extract all valid image URLs from extras.imagesSmall
-            product_images = [
-                url for url in images_small.values() if url.endswith(".jpg")
-            ]
-
+            images_small = extras.get("imagesSmall", [])
+        
+            # Ensure `images_small` is treated as a list
+            if isinstance(images_small, dict):
+                # If it's a dictionary, extract values
+                images_small = list(images_small.values())
+        
+            # Extract all valid image URLs from imagesSmall
+            product_images = [url for url in images_small if isinstance(url, str) and url.endswith(".jpg")]
+        
             processed_data = {
                 "title": product_data.get("title", "Untitled"),
                 "images": product_images,
                 "price": product_data.get("price", "N/A"),
-                "url": product_data.get("url", link),
-                #"description": product_data.get("description", ""),
+            "url": product_data.get("url", link),
+                # "description": product_data.get("description", ""),
             }
+
 
             print("Processed Data from SOAX:", processed_data)
             return processed_data
