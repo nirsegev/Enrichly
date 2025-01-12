@@ -4,7 +4,7 @@ from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
-import OpenGraph
+import opengraph
 
 app = Flask(__name__)
 
@@ -101,8 +101,9 @@ def analyze_link(link):
 
     # Fallback to OpenGraph metadata extraction
     try:
-        og = OpenGraph(url=link)
+        og = opengraph.OpenGraph(url=link)
         if og.is_valid():
+            print og.to_json()
             # Ensure `images` is always a list
             images = og.get("image")
             if not isinstance(images, list):
