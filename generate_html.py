@@ -92,6 +92,12 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 color: #555;
                 margin: 8px 0 0;
             }}
+
+            .price {{
+                font-weight: bold;
+                color: #27ae60;
+                margin-top: 8px;
+            }}
         </style>
     </head>
     <body>
@@ -108,6 +114,10 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         images = metadata.get("images", ["https://via.placeholder.com/70"])  # Default image if none provided
         first_image = images[0] if images else "https://via.placeholder.com/70"
 
+        # Format price if available
+        price = metadata.get("price", None)
+        price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
+
         # Create bookmark section
         history_html += f"""
         <div class="bookmark">
@@ -115,6 +125,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="bookmark-content">
                 <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
                 <p>{metadata.get('description', '')}</p>
+                {price_html}
             </div>
         </div>
         """
@@ -132,6 +143,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 
 
