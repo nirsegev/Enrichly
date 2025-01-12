@@ -49,7 +49,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 border-radius: 8px;
                 padding: 12px;
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }}
 
@@ -121,7 +121,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         # Create bookmark section
         history_html += f"""
         <div class="bookmark">
-            {image_html}
+            {"".join([image_html]) if images else ""}
             <div class="bookmark-content">
                 <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
                 <p>{metadata.get('description', '')}</p>
@@ -143,6 +143,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 
 
