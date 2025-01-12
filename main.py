@@ -128,10 +128,6 @@ def analyze_link(link):
             if tag.get("property") == "og:locale":
                 data["locale"] = tag.get("content", data["locale"])
 
-        # Ensure 'images' is always a list, even if no images found
-        if not data["images"]:
-            data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
-
         print(data)
         return data
 
