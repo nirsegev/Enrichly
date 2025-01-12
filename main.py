@@ -134,8 +134,6 @@ def analyze_link(link):
             data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
 
         return data
-    except Exception as e:
-        print(f"OpenGraph extraction error: {e}")
 
 
     # Return minimal data if both SOAX and OpenGraph fail
