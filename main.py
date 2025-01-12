@@ -103,7 +103,7 @@ def analyze_link(link):
     try:
         og = opengraph.OpenGraph(url=link)
         if og.is_valid():
-            print og.to_json()
+            print (og.to_json())
             # Ensure `images` is always a list
             images = og.get("image")
             if not isinstance(images, list):
