@@ -107,12 +107,14 @@ def analyze_link(link):
                 og_data[key] = meta.get("content", "").strip()
 
         # Default fallback values
-        processed_data = {
-            "title": og_data.get("og:title") or og_data.get("twitter:title") or soup.title.string.strip(),
-            "description": og_data.get("og:description") or og_data.get("twitter:description") or "",
-            "url": og_data.get("og:url") or link,
-            "images": og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150" or [],
-            "site_name": og_data.get("og:site_name", "Unknown"),
+       processed_data = {
+        "title": og_data.get("og:title") or og_data.get("twitter:title") or soup.title.string.strip(),
+        "description": og_data.get("og:description") or og_data.get("twitter:description") or "",
+        "url": og_data.get("og:url") or link,
+        "images": [og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150"]
+        if isinstance(og_data.get("og:image") or og_data.get("twitter:image") or "https://via.placeholder.com/150", str)
+        else og_data.get("og:image") or og_data.get("twitter:image") or [],
+        "site_name": og_data.get("og:site_name", "Unknown"),
         }
 
         print("Processed Data from OpenGraph:", processed_data)
