@@ -98,12 +98,16 @@ def analyze_link(link):
     try:
         response = requests.get(link, headers=headers_general, timeout=10)
         response.raise_for_status()
-        
+
         # Read only the first 1024 bytes of the response
         first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
-        
+
         print("Starting soup parsing")
         soup = BeautifulSoup(response.text, "html.parser")
+
+        # Count and display the number of "meta" tags found
+        meta_tags = soup.find_all("meta")
+        print(f"Number of meta tags found: {len(meta_tags)}")
 
         # Data holder for OpenGraph metadata
         data = {
@@ -116,7 +120,7 @@ def analyze_link(link):
         }
 
         # Extract OpenGraph meta tags
-        for tag in soup.find_all("meta"):
+        for tag in meta_tags:
             if tag.get("property") == "og:title":
                 data["title"] = tag.get("content", data["title"])
             if tag.get("property") == "og:description":
@@ -132,7 +136,7 @@ def analyze_link(link):
             if tag.get("property") == "og:locale":
                 data["locale"] = tag.get("content", data["locale"])
 
-        print(data)
+        print("Extracted OpenGraph Data:", data)
         return data
 
     except requests.exceptions.RequestException as e:
