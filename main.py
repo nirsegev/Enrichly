@@ -142,7 +142,7 @@ def analyze_link(link):
 
     # Return minimal data if both SOAX and OpenGraph fail
     return {
-        "title": "Untitled",
+        "title": link,
         "images": [],
         "price": "N/A",
         "url": link,
