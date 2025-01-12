@@ -104,15 +104,17 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     """
 
     for link, metadata in zip(user_links.get(chat_id, []), link_metadata.get(chat_id, [])):
+        # Handle images
         images = metadata.get("images", ["https://via.placeholder.com/70"])  # Default image if none provided
         first_image = images[0] if images else "https://via.placeholder.com/70"
 
+        # Create bookmark section
         history_html += f"""
         <div class="bookmark">
-            <img src="{first_image}" alt="Product Image">
+            <img src="{first_image}" alt="Image">
             <div class="bookmark-content">
                 <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
-                <p>Price: {metadata.get('price', 'N/A')}</p>
+                <p>{metadata.get('description', '')}</p>
             </div>
         </div>
         """
@@ -124,11 +126,13 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     </html>
     """
 
+    # Save the HTML file
     file_path = os.path.join(directory, f"{chat_id}_history.html")
     with open(file_path, "w") as file:
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 
 
