@@ -100,22 +100,41 @@ def analyze_link(link):
         print(f"SOAX API error: {e}")
 
     # Fallback to OpenGraph metadata extraction
-    try:
-        og = OpenGraph(url=link)
-        if og.is_valid():
-            print (og.to_json())
-            # Ensure `images` is always a list
-            images = og.get("image")
-            if not isinstance(images, list):
-                images = [images] if images else []
+     # Parse the HTML content using BeautifulSoup
+    soup = BeautifulSoup(response.text, "html.parser")
+    
+    # Data holder for OpenGraph metadata
+    data = {
+        "title": "Untitled",
+        "description": "",
+        "url": link,
+        "images": [],
+        "site_name": "Unknown",
+        "locale": None,
+    }
+    
+    # Extract OpenGraph meta tags
+    for tag in soup.find_all("meta"):
+        if tag.get("property") == "og:title":
+            data["title"] = tag.get("content", data["title"])
+        if tag.get("property") == "og:description":
+            data["description"] = tag.get("content", data["description"])
+        if tag.get("property") == "og:url":
+            data["url"] = tag.get("content", data["url"])
+        if tag.get("property") == "og:image":
+            image = tag.get("content", None)
+            if image:
+                data["images"].append(image)
+        if tag.get("property") == "og:site_name":
+            data["site_name"] = tag.get("content", data["site_name"])
+        if tag.get("property") == "og:locale":
+            data["locale"] = tag.get("content", data["locale"])
 
-            return {
-                "title": og.get("title", "Untitled"),
-                "description": og.get("description", ""),
-                "url": og.get("url", link),
-                "images": images,
-                "site_name": og.get("site_name", "Unknown"),
-            }
+        # Ensure 'images' is always a list, even if no images found
+        if not data["images"]:
+            data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
+
+        return data
     except Exception as e:
         print(f"OpenGraph extraction error: {e}")
 
