@@ -87,7 +87,8 @@ def analyze_link(link):
     try:
         response = requests.get(link, timeout=10)
         response.raise_for_status()
-
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
         og_data = {}
         for meta in soup.find_all("meta"):
             if meta.get("property", "").startswith("og:") or meta.get("name", "").startswith("twitter:"):
