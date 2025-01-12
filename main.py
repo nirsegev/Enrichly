@@ -103,7 +103,7 @@ def analyze_link(link):
         first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
         
         print("Starting soup parsing")
-        soup = BeautifulSoup(first_kb, "html.parser")
+        soup = BeautifulSoup(response.text, "html.parser")
 
         # Data holder for OpenGraph metadata
         data = {
