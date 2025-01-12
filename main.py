@@ -74,7 +74,7 @@ def analyze_link(link):
                 "images": product_images,
                 "price": product_data.get("price", "N/A"),
                 "url": product_data.get("url", link),
-                "description": product_data.get("description", ""),
+                #"description": product_data.get("description", ""),
             }
 
             print("Processed Data from SOAX:", processed_data)
