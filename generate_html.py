@@ -112,7 +112,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     for link, metadata in zip(user_links.get(chat_id, []), link_metadata.get(chat_id, [])):
         # Handle images
         images = metadata.get("images", ["https://via.placeholder.com/70"])  # Default image if none provided
-        first_image = images[0] if images else "https://via.placeholder.com/70"
+        first_image = images if images else "https://via.placeholder.com/70"
 
         # Format price if available
         price = metadata.get("price", None)
