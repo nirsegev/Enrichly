@@ -102,7 +102,7 @@ def analyze_link(link):
         response_size = len(response.content)
         print(f"Response content size: {response_size} bytes")
         
-        response.raise_for_status()
+        #response.raise_for_status()
 
         # Read only the first 1024 bytes of the response
         #first_kb = response.raw.read(1024, decode_content=True).decode("utf-8", errors="ignore")
