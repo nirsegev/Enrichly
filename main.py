@@ -100,44 +100,51 @@ def analyze_link(link):
 
     # Fallback to OpenGraph metadata extraction
      # Parse the HTML content using BeautifulSoup
-    print (f"starting soup parsing")
-    soup = BeautifulSoup(response.text, "html.parser")
+     try:
+        response = requests.get(link, timeout=10)
+        response.raise_for_status()
+        print (f"starting soup parsing")
+        soup = BeautifulSoup(response.text, "html.parser")
+        
+        # Data holder for OpenGraph metadata
+        data = {
+            "title": "Untitled",
+            "description": "",
+            "url": link,
+            "images": [],
+            "site_name": "Unknown",
+            "locale": None,
+        }
+        
+        # Extract OpenGraph meta tags
+        for tag in soup.find_all("meta"):
+            print (f"found soup meta tags")
+            if tag.get("property") == "og:title":
+                data["title"] = tag.get("content", data["title"])
+            if tag.get("property") == "og:description":
+                data["description"] = tag.get("content", data["description"])
+            if tag.get("property") == "og:url":
+                data["url"] = tag.get("content", data["url"])
+            if tag.get("property") == "og:image":
+                image = tag.get("content", None)
+                if image:
+                    data["images"].append(image)
+            if tag.get("property") == "og:site_name":
+                data["site_name"] = tag.get("content", data["site_name"])
+            if tag.get("property") == "og:locale":
+                data["locale"] = tag.get("content", data["locale"])
     
-    # Data holder for OpenGraph metadata
-    data = {
-        "title": "Untitled",
-        "description": "",
-        "url": link,
-        "images": [],
-        "site_name": "Unknown",
-        "locale": None,
-    }
+            # Ensure 'images' is always a list, even if no images found
+            if not data["images"]:
+                data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
     
-    # Extract OpenGraph meta tags
-    for tag in soup.find_all("meta"):
-        print (f"found soup meta tags")
-        if tag.get("property") == "og:title":
-            data["title"] = tag.get("content", data["title"])
-        if tag.get("property") == "og:description":
-            data["description"] = tag.get("content", data["description"])
-        if tag.get("property") == "og:url":
-            data["url"] = tag.get("content", data["url"])
-        if tag.get("property") == "og:image":
-            image = tag.get("content", None)
-            if image:
-                data["images"].append(image)
-        if tag.get("property") == "og:site_name":
-            data["site_name"] = tag.get("content", data["site_name"])
-        if tag.get("property") == "og:locale":
-            data["locale"] = tag.get("content", data["locale"])
-
-        # Ensure 'images' is always a list, even if no images found
-        if not data["images"]:
-            data["images"] = ["https://via.placeholder.com/150"]  # Placeholder image
-
-        print (data)
-        return data
-
+            print (data)
+            return data
+    
+    except requests.exceptions.RequestException as e:
+        print(f"OpenGraph extraction error: {e}")
+    except Exception as e:
+        print(f"Error parsing OpenGraph metadata: {e}")
 
     # Return minimal data if both SOAX and OpenGraph fail
     return {
