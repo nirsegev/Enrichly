@@ -97,7 +97,7 @@ def analyze_link(link):
     # Fallback to OpenGraph metadata extraction
     try:
         soax_unblocker_link = f"https://scraping.soax.com/v1/unblocker/html?xhr=false&url={link}"
-        response = requests.get(soax_unblocker_link, headers=headers_general, timeout=10)
+        response = requests.get(soax_unblocker_link, headers=headers_soax, timeout=10)
         
         # Log response size
         response_size = len(response.content)
