@@ -103,7 +103,7 @@ def analyze_link(link):
 
         # Data holder for OpenGraph metadata
         data = {
-            "title": "Untitled",
+            "title": link,
             "description": "",
             "url": link,
             "images": [],
