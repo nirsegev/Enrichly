@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 def generate_html(chat_id, user_links, link_metadata, first_name):
     """Generate a mobile-friendly HTML file with link history and metadata."""
