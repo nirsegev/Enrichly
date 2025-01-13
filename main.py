@@ -32,7 +32,7 @@ def webhook():
     data = request.get_json()
 
     if "message" in data:
-        chat_id = data["message"]["chat"].get("id")
+        chat_id = str(data["message"]["chat"].get("id"))
         first_name = data["message"]["chat"].get("first_name")  # Extract first name
         text = data["message"].get("text")
 
