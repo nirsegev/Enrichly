@@ -9,3 +9,4 @@ requests
 beautifulsoup4
 sqlalchemy
 psycopg2
+flask_sqlalchemy
