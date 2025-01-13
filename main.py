@@ -76,7 +76,7 @@ def webhook():
                     "description": link.description,
                     "url": link.url,
                     "price": link.price,
-                    "images": link.images.split(",") if link.images else [],
+                    "images": link.images if link.images else [],
                     "tags": [tag.name for tag in link.tags],
                 }
                 for link in user_links
