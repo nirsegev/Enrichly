@@ -134,15 +134,17 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
 
     def generate_bookmark_cards():
         cards_html = ""
+        current_time = datetime.now()
+    
         for link, metadata in zip(user_links, link_metadata):
             # Handle images
             images = metadata.get("images", [])
             image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
-
+    
             # Format price if available
             price = metadata.get("price", None)
             price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
-
+    
             # Handle tags
             tags = metadata.get("tags", [])
             tags_html = (
@@ -151,7 +153,20 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 "</div>"
                 if tags else ""
             )
-
+    
+            # Format creation time
+            created_at = metadata.get("created_at")
+            created_at_html = ""
+            if created_at:
+                days_difference = (current_time - created_at).days
+                if days_difference == 0:
+                    formatted_time = created_at.strftime("%d/%m/%y %H:%M")
+                elif days_difference == 1:
+                    formatted_time = created_at.strftime("%d/%m/%y")
+                else:
+                    formatted_time = f"{days_difference} days ago"
+                created_at_html = f'<p style="text-align: right; font-size: 0.8rem; color: #888;">{formatted_time}</p>'
+    
             # Generate card
             tags_attr = " ".join(tags)
             cards_html += f"""
@@ -162,6 +177,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     <p>{metadata.get('description', '')}</p>
                     {price_html}
                     {tags_html}
+                    {created_at_html}
                 </div>
             </div>
             """
