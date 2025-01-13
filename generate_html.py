@@ -126,22 +126,22 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     """
 
     for link, metadata in zip(user_links, link_metadata):
-    # Handle images
-    images = metadata.get("images", [])
-    image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
-
-    # Format price if available
-    price = metadata.get("price", None)
-    price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
-
-    # Handle tags
-    tags = metadata.get("tags", [])
-    tags_html = (
-        '<div class="tags">' +
-        "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
-        "</div>"
-        if tags else ""
-    )
+        # Handle images
+        images = metadata.get("images", [])
+        image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
+    
+        # Format price if available
+        price = metadata.get("price", None)
+        price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
+    
+        # Handle tags
+        tags = metadata.get("tags", [])
+        tags_html = (
+            '<div class="tags">' +
+            "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+            "</div>"
+            if tags else ""
+        )
 
     # Create bookmark section
     history_html += f"""
