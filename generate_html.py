@@ -138,45 +138,45 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         print(f"Images: {images}")  # Debug: Print the list of images
         image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
 
-    # Format price if available
-    price = metadata.get("price", None)
-    print(f"Price: {price}")  # Debug: Print the price
-    price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
-
-    # Handle tags
-    tags = metadata.get("tags", [])
-    print(f"Tags: {tags}")  # Debug: Print the tags
-    tags_html = (
-        '<div class="tags">' +
-        "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
-        "</div>"
-        if tags else ""
-    )
-
-    # Print the generated HTML for this link
-    print(f"Generated HTML for this link: {image_html} {price_html} {tags_html}")
-
-
-    # Create bookmark section
-    history_html += f"""
-    <div class="bookmark">
-        {image_html}
-        <div class="bookmark-content">
-            <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:150] + ("..." if len(metadata.get('title', '')) > 150 else "")}</a></h3>
-            <p>{metadata.get('description', '')}</p>
-            {price_html}
-            {tags_html}
-        </div>
-    </div>
-    """
-
-
-    history_html += """
+        # Format price if available
+        price = metadata.get("price", None)
+        print(f"Price: {price}")  # Debug: Print the price
+        price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
+    
+        # Handle tags
+        tags = metadata.get("tags", [])
+        print(f"Tags: {tags}")  # Debug: Print the tags
+        tags_html = (
+            '<div class="tags">' +
+            "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+            "</div>"
+            if tags else ""
+        )
+    
+        # Print the generated HTML for this link
+        print(f"Generated HTML for this link: {image_html} {price_html} {tags_html}")
+    
+    
+        # Create bookmark section
+        history_html += f"""
+        <div class="bookmark">
+            {image_html}
+            <div class="bookmark-content">
+                <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:150] + ("..." if len(metadata.get('title', '')) > 150 else "")}</a></h3>
+                <p>{metadata.get('description', '')}</p>
+                {price_html}
+                {tags_html}
             </div>
         </div>
-    </body>
-    </html>
-    """
+        """
+    
+    
+        history_html += """
+                </div>
+            </div>
+        </body>
+        </html>
+        """
 
     # Save the HTML file
     file_path = os.path.join(directory, f"{chat_id}_history.html")
