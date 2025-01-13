@@ -68,13 +68,26 @@ def webhook():
                 db.session.add(user_link)
                 db.session.commit()
 
+            # Query the database for user links and metadata
+            user_links = UserLink.query.filter_by(chat_id=chat_id).all()
+            link_metadata = [
+                {
+                    "title": link.title,
+                    "description": link.description,
+                    "url": link.url,
+                    "price": link.price,
+                    "images": link.images.split(",") if link.images else [],
+                    "tags": [tag.name for tag in link.tags],
+                }
+                for link in user_links
+            ]
+
             # Generate updated HTML
-            html_link = generate_html(chat_id)
+            html_link = generate_html(chat_id, user_links, link_metadata, first_name)
             send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
-
 
 
 def analyze_link(link):
