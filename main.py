@@ -111,8 +111,9 @@ def _fetch_opengraph_metadata(link):
     """Fallback: Fetch OpenGraph metadata."""
     print("Using OpenGraph metadata extraction.")
     headers = {'X-SOAX-API-Secret': X_SOAX_API_Secret}
+    soax_unblocker_link = f"https://scraping.soax.com/v1/unblocker/html?xhr=false&url={link}"
     try:
-        response = requests.get(link, headers=headers, timeout=60)
+        response = requests.get(soax_unblocker_link, headers=headers, timeout=60)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         return _extract_opengraph_tags(soup, link)
@@ -122,6 +123,7 @@ def _fetch_opengraph_metadata(link):
 
 def _extract_opengraph_tags(soup, link):
     """Extract OpenGraph metadata from the page."""
+    print("_extract_opengraph_tags")
     def get_meta(property_name):
         tag = soup.find("meta", property=property_name)
         return tag["content"] if tag and tag.get("content") else None
