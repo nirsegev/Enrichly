@@ -90,6 +90,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: normal;
+                word-wrap: break-word; /* Prevent overflow */
+                max-width: 100%; /* Ensure the title doesn't exceed the card width */
             }
             .bookmark h3 a {
                 text-decoration: none;
@@ -124,6 +126,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }
         </style>
         """
+
 
     def generate_tag_filters():
         filters_html = '<div class="filters">'
