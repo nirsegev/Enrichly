@@ -70,7 +70,6 @@ def webhook():
 
             # Query the database for user links and metadata
             user_links = UserLink.query.filter_by(chat_id=chat_id).all()
-            print(user_links)
             link_metadata = [
                 {
                     "title": link.title,
@@ -80,17 +79,19 @@ def webhook():
                     "images": link.images if isinstance(link.images, list) else link.images.split(","),
                     "site_name": link.site_name,
                     "tags": [tag.name for tag in link.tags],
+                    "created_at": link.created_at,  # Pass raw datetime object
                 }
                 for link in user_links
             ]
-            print(link_metadata)
-            
+
+            # Generate the HTML
             html_link = generate_html(chat_id, user_links, link_metadata, first_name)
 
             send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
+
 
 
 def analyze_link(link):
