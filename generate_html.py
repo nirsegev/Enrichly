@@ -40,17 +40,23 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 margin-top: 16px;
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 16px;
+                gap: 16px; /* Space between cards */
             }}
 
             .bookmark {{
                 background-color: #fff;
                 border: 1px solid #ddd;
                 border-radius: 8px;
-                padding: 12px;
+                padding: 16px; /* Added padding */
+                margin: 8px 0; /* Ensure separation vertically */
                 display: flex;
                 align-items: flex-start;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.2s; /* Added hover effect */
+            }}
+
+            .bookmark:hover {{
+                transform: translateY(-5px); /* Slight hover effect */
             }}
 
             .bookmark img {{
@@ -125,37 +131,27 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="bookmarks">
     """
 
-   # Print the counts of user_links and link_metadata
-    print(f"Number of items in user_links: {len(user_links)}")  # Debug: Count of user_links
-    print(f"Number of items in link_metadata: {len(link_metadata)}")  # Debug: Count of link_metadata
-    
+    # Debugging
+    print(f"Number of items in user_links: {len(user_links)}")
+    print(f"Number of items in link_metadata: {len(link_metadata)}")
+
     for link, metadata in zip(user_links, link_metadata):
-        print(f"Processing link: {link}")  # Debug: Print the current link
-        print(f"Metadata: {metadata}")  # Debug: Print the metadata for the current link
-        
         # Handle images
         images = metadata.get("images", [])
-        print(f"Images: {images}")  # Debug: Print the list of images
         image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
 
         # Format price if available
         price = metadata.get("price", None)
-        print(f"Price: {price}")  # Debug: Print the price
         price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
     
         # Handle tags
         tags = metadata.get("tags", [])
-        print(f"Tags: {tags}")  # Debug: Print the tags
         tags_html = (
             '<div class="tags">' +
             "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
             "</div>"
             if tags else ""
         )
-    
-        # Print the generated HTML for this link
-        print(f"Generated HTML for this link: {image_html} {price_html} {tags_html}")
-    
     
         # Create bookmark section
         history_html += f"""
@@ -170,7 +166,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         </div>
         """
     
-    
     history_html += """
             </div>
         </div>
@@ -184,6 +179,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
 
 def generate_bookmarks(chat_id, user_links, link_metadata):
