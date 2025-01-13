@@ -37,19 +37,44 @@ def webhook():
         text = data["message"].get("text")
 
         if text and text.startswith("http"):
-            user_links[chat_id].append(text)
+            # Extract tags from the message
+            parts = text.split()
+            link = parts[0]
+            tags = [part.lstrip("#") for part in parts[1:] if part.startswith("#")]
 
             # Fetch and analyze link
-            metadata = analyze_link(text)
+            metadata = analyze_link(link)
             if metadata:
-                link_metadata[chat_id].append(metadata)
+                # Save the link to the database
+                user_link = UserLink(
+                    chat_id=chat_id,
+                    link=link,
+                    title=metadata.get("title"),
+                    description=metadata.get("description"),
+                    url=metadata.get("url"),
+                    price=metadata.get("price"),
+                    images=metadata.get("images"),
+                    site_name=metadata.get("site_name"),
+                )
+
+                # Add tags to the link
+                for tag_name in tags:
+                    tag = Tag.query.filter_by(name=tag_name).first()
+                    if not tag:
+                        tag = Tag(name=tag_name)
+                        db.session.add(tag)
+                    user_link.tags.append(tag)
+
+                db.session.add(user_link)
+                db.session.commit()
 
             # Generate updated HTML
-            html_link = generate_html(chat_id, user_links, link_metadata, first_name)  
+            html_link = generate_html(chat_id)
             send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
         else:
             send_message(chat_id, "Please send a valid link.")
     return jsonify({"status": "ok"}), 200
+
 
 
 def analyze_link(link):
@@ -198,6 +223,30 @@ def serve_file(filename):
 def create_db():
     db.create_all()
     return "Database tables created successfully!", 200
+
+@app.route("/links/<chat_id>/tags", methods=["GET"])
+def get_links_by_tags(chat_id):
+    # Get tags from request arguments
+    tags = request.args.getlist("tag")  # Example: ?tag=tag1&tag=tag2
+
+    # Build the query
+    query = UserLink.query.filter_by(chat_id=chat_id)
+    if tags:
+        query = query.filter(UserLink.tags.any(Tag.name.in_(tags)))
+
+    # Fetch and return links
+    links = query.order_by(UserLink.created_at.desc()).all()
+    return jsonify([
+        {
+            "id": link.id,
+            "title": link.title,
+            "description": link.description,
+            "url": link.url,
+            "tags": [tag.name for tag in link.tags],
+        }
+        for link in links
+    ])
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
