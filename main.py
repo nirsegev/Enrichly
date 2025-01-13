@@ -69,7 +69,7 @@ def webhook():
                 db.session.commit()
 
             # Query the database for user links and metadata
-            user_links = UserLink.query.filter_by(chat_id=chat_id).all()
+            user_links = UserLink.query.filter_by(chat_id=str(chat_id)).all()
             link_metadata = [
                 {
                     "title": link.title,
