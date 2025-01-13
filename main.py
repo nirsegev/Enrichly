@@ -153,6 +153,7 @@ def webhook():
     link, tags = _extract_tags_from_text(text)
     metadata = analyze_link(link)
     if metadata:
+        print("metadata exists, saving link to db")
         _save_link_to_db(chat_id, link, tags, metadata)
 
     # Generate and send HTML
@@ -176,6 +177,7 @@ def _extract_tags_from_text(text):
 
 def _save_link_to_db(chat_id, link, tags, metadata):
     """Save link and metadata to the database."""
+    print("saving link to db")
     user_link = UserLink(
         chat_id=chat_id,
         link=link,
@@ -199,6 +201,7 @@ def _save_link_to_db(chat_id, link, tags, metadata):
 
 def _generate_and_send_html(chat_id, first_name):
     """Generate HTML and send link history."""
+    print("_generate_and_send_html")
     user_links = UserLink.query.filter_by(chat_id=chat_id).all()
     link_metadata = [
         {
