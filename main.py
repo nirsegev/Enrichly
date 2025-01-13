@@ -4,8 +4,17 @@ from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
+# Configure database
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
 
 # Store user data (link history)
 user_links = defaultdict(list)
@@ -187,7 +196,6 @@ def serve_file(filename):
 
 @app.route('/create_db', methods=['GET'])
 def create_db():
-    from main import db
     db.create_all()
     return "Database tables created successfully!", 200
 
