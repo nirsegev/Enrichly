@@ -224,6 +224,48 @@ def send_message(chat_id, text):
     payload = {"chat_id": chat_id, "text": text}
     requests.post(url, json=payload)
 
+# Serve static HTML files
+@app.route('/storage/links_history/<filename>')
+def serve_file(filename):
+    # Serve the HTML content with cache-control headers
+    try:
+        # Read the HTML file content
+        with open(f'/app/storage/links_history/{filename}', 'r') as file:
+            html_content = file.read()
+        
+        # Return the HTML content with cache-control headers
+        return Response(html_content, headers={
+            'Cache-Control': 'no-cache, no-store, must-revalidate',  # Prevent caching
+            'Pragma': 'no-cache',  # HTTP 1.0 compatibility
+            'Expires': '0'  # Ensure it expires immediately
+        })
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
+
+
+@app.route("/links/<chat_id>/tags", methods=["GET"])
+def get_links_by_tags(chat_id):
+    # Get tags from request arguments
+    tags = request.args.getlist("tag")  # Example: ?tag=tag1&tag=tag2
+
+    # Build the query
+    query = UserLink.query.filter_by(chat_id=chat_id)
+    if tags:
+        query = query.filter(UserLink.tags.any(Tag.name.in_(tags)))
+
+    # Fetch and return links
+    links = query.order_by(UserLink.created_at.desc()).all()
+    return jsonify([
+        {
+            "id": link.id,
+            "title": link.title,
+            "description": link.description,
+            "url": link.url,
+            "tags": [tag.name for tag in link.tags],
+        }
+        for link in links
+    ])
+
 # Database Management
 @app.route("/create_db", methods=["GET"])
 def create_db():
