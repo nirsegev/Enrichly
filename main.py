@@ -70,6 +70,7 @@ def webhook():
 
             # Query the database for user links and metadata
             user_links = UserLink.query.filter_by(chat_id=chat_id).all()
+            print(user_links)
             link_metadata = [
                 {
                     "title": link.title,
@@ -82,6 +83,7 @@ def webhook():
                 }
                 for link in user_links
             ]
+            print(link_metadata)
             
             html_link = generate_html(chat_id, user_links, link_metadata, first_name)
 
