@@ -178,7 +178,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 {image_html}
                 <div class="bookmark-content">
                     <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:100]}</a></h3>
-                    <p>{metadata.get('description', '')[:200] + ("..." if len(metadata.get('description', '')) > 200 else "")}</p>
+                    <p>{(metadata.get('description') or '')[:200] + ("..." if metadata.get('description') and len(metadata.get('description')) > 200 else "")}</p>
                     {price_html}
                     {tags_html}
                     {created_at_html}
