@@ -110,7 +110,7 @@ def _process_soax_response(result, link):
 def _fetch_opengraph_metadata(link):
     """Fallback: Fetch OpenGraph metadata."""
     print("Using OpenGraph metadata extraction.")
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {'X-SOAX-API-Secret': X_SOAX_API_Secret}
     try:
         response = requests.get(link, headers=headers, timeout=60)
         response.raise_for_status()
