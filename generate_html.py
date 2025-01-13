@@ -98,6 +98,22 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 color: #27ae60;
                 margin-top: 8px;
             }}
+
+            .tags {{
+                margin-top: 8px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }}
+
+            .tag {{
+                background-color: #e0f7fa;
+                color: #00796b;
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+                display: inline-block;
+            }}
         </style>
     </head>
     <body>
@@ -118,14 +134,24 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         price = metadata.get("price", None)
         price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
 
+        # Handle tags
+        tags = metadata.get("tags", [])
+        tags_html = (
+            '<div class="tags">' +
+            "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+            "</div>"
+            if tags else ""
+        )
+
         # Create bookmark section
         history_html += f"""
         <div class="bookmark">
-            {"".join([image_html]) if images else ""}
+            {image_html}
             <div class="bookmark-content">
                 <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
                 <p>{metadata.get('description', '')}</p>
                 {price_html}
+                {tags_html}
             </div>
         </div>
         """
@@ -143,9 +169,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
-
-
-
 
 
 def generate_bookmarks(chat_id, user_links, link_metadata):
