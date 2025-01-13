@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
+from db_model import UserLink
 
 app = Flask(__name__)
 
