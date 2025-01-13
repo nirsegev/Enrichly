@@ -125,36 +125,37 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="bookmarks">
     """
 
-    for link, metadata in zip(user_links.get(chat_id, []), link_metadata.get(chat_id, [])):
-        # Handle images
-        images = metadata.get("images", [])
-        image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
+    for link, metadata in zip(user_links, link_metadata):
+    # Handle images
+    images = metadata.get("images", [])
+    image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
 
-        # Format price if available
-        price = metadata.get("price", None)
-        price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
+    # Format price if available
+    price = metadata.get("price", None)
+    price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
 
-        # Handle tags
-        tags = metadata.get("tags", [])
-        tags_html = (
-            '<div class="tags">' +
-            "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
-            "</div>"
-            if tags else ""
-        )
+    # Handle tags
+    tags = metadata.get("tags", [])
+    tags_html = (
+        '<div class="tags">' +
+        "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+        "</div>"
+        if tags else ""
+    )
 
-        # Create bookmark section
-        history_html += f"""
-        <div class="bookmark">
-            {image_html}
-            <div class="bookmark-content">
-                <h3><a href="{metadata.get('url', link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
-                <p>{metadata.get('description', '')}</p>
-                {price_html}
-                {tags_html}
-            </div>
+    # Create bookmark section
+    history_html += f"""
+    <div class="bookmark">
+        {image_html}
+        <div class="bookmark-content">
+            <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
+            <p>{metadata.get('description', '')}</p>
+            {price_html}
+            {tags_html}
         </div>
-        """
+    </div>
+    """
+
 
     history_html += """
             </div>
