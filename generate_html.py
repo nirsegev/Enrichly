@@ -174,16 +174,17 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             # Generate card
             tags_attr = " ".join(tags)
             cards_html += f"""
-            <div class="bookmark" data-tags="{tags_attr}">
+           <div class="bookmark" data-tags="{tags_attr}">
                 {image_html}
                 <div class="bookmark-content">
-                    <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:150]}</a></h3>
-                    <p>{metadata.get('description', '')}</p>
+                    <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:100]}</a></h3>
+                    <p>{metadata.get('description', '')[:200] + ("..." if len(metadata.get('description', '')) > 200 else "")}</p>
                     {price_html}
                     {tags_html}
                     {created_at_html}
                 </div>
             </div>
+
             """
         return cards_html
 
