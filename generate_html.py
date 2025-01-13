@@ -171,12 +171,12 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         """
     
     
-        history_html += """
-                </div>
+    history_html += """
             </div>
-        </body>
-        </html>
-        """
+        </div>
+    </body>
+    </html>
+    """
 
     # Save the HTML file
     file_path = os.path.join(directory, f"{chat_id}_history.html")
