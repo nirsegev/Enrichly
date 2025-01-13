@@ -64,7 +64,7 @@ def analyze_link(link):
         api_url = f"https://scraping.soax.com/v1/request?param={link}&function=getProduct&sync=true"
 
         try:
-            response = requests.get(api_url, headers=headers_soax, timeout=10)
+            response = requests.get(api_url, headers=headers_soax, timeout=60)
             response.raise_for_status()
 
             # Parse the SOAX response JSON
