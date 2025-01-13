@@ -125,30 +125,44 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="bookmarks">
     """
 
+   # Print the counts of user_links and link_metadata
+    print(f"Number of items in user_links: {len(user_links)}")  # Debug: Count of user_links
+    print(f"Number of items in link_metadata: {len(link_metadata)}")  # Debug: Count of link_metadata
+    
     for link, metadata in zip(user_links, link_metadata):
+        print(f"Processing link: {link}")  # Debug: Print the current link
+        print(f"Metadata: {metadata}")  # Debug: Print the metadata for the current link
+        
         # Handle images
         images = metadata.get("images", [])
+        print(f"Images: {images}")  # Debug: Print the list of images
         image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
-    
-        # Format price if available
-        price = metadata.get("price", None)
-        price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
-    
-        # Handle tags
-        tags = metadata.get("tags", [])
-        tags_html = (
-            '<div class="tags">' +
-            "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
-            "</div>"
-            if tags else ""
-        )
+
+    # Format price if available
+    price = metadata.get("price", None)
+    print(f"Price: {price}")  # Debug: Print the price
+    price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
+
+    # Handle tags
+    tags = metadata.get("tags", [])
+    print(f"Tags: {tags}")  # Debug: Print the tags
+    tags_html = (
+        '<div class="tags">' +
+        "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+        "</div>"
+        if tags else ""
+    )
+
+    # Print the generated HTML for this link
+    print(f"Generated HTML for this link: {image_html} {price_html} {tags_html}")
+
 
     # Create bookmark section
     history_html += f"""
     <div class="bookmark">
         {image_html}
         <div class="bookmark-content">
-            <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')}</a></h3>
+            <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:150] + ("..." if len(metadata.get('title', '')) > 150 else "")}</a></h3>
             <p>{metadata.get('description', '')}</p>
             {price_html}
             {tags_html}
