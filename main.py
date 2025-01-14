@@ -138,6 +138,10 @@ def _extract_opengraph_tags(soup, link):
 
 # Telegram Bot Endpoints
 @app.route("/webhook", methods=["POST"])
+from flask import Flask, request, jsonify
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+@app.route("/webhook", methods=["POST"])
 def webhook():
     """Handle Telegram webhook messages."""
     data = request.get_json()
@@ -154,12 +158,22 @@ def webhook():
     metadata = analyze_link(link)
     if metadata:
         print("metadata exists, saving link to db")
-        _save_link_to_db(chat_id, link, tags, metadata)
+        link_id = _save_link_to_db(chat_id, link, tags, metadata)
 
-    # Generate and send HTML
-    html_link = _generate_and_send_html(chat_id, first_name)
-    send_message(chat_id, f"Thanks for sharing! Your link history: {html_link}")
+    # Send tagging options
+    existing_tags = [tag.name for tag in Tag.query.order_by(Tag.name).all()]
+    inline_keyboard = generate_inline_keyboard(link_id, existing_tags)
+    send_message_with_buttons(chat_id, "Tag this link:", inline_keyboard)
     return jsonify({"status": "ok"}), 200
+
+def generate_inline_keyboard(link_id, existing_tags):
+    """Generate inline keyboard with existing tags and an option to add a new tag."""
+    keyboard = [
+        [InlineKeyboardButton(tag, callback_data=f"tag:{link_id}:{tag}") for tag in existing_tags],
+        [InlineKeyboardButton("Add New Tag", callback_data=f"add_tag:{link_id}")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 
 def _parse_message(data):
     """Extract relevant message data."""
@@ -372,6 +386,54 @@ def delete_all_links_and_tags(chat_id):
     generate_html(chat_id, [], [], first_name)
 
     return jsonify({"message": "All links and tags deleted successfully!"}), 200
+
+@app.route("/callback", methods=["POST"])
+def callback():
+    """Handle callback queries from Telegram inline buttons."""
+    data = request.get_json()
+    callback_query = data.get("callback_query")
+    if not callback_query:
+        return jsonify({"status": "ignored"}), 200
+
+    chat_id = callback_query["message"]["chat"]["id"]
+    callback_data = callback_query["data"]
+    message_id = callback_query["message"]["message_id"]
+
+    if callback_data.startswith("tag:"):
+        _, link_id, tag_name = callback_data.split(":")
+        _add_tag_to_link(link_id, tag_name)
+        send_message(chat_id, f"Tag '{tag_name}' added to the link!")
+
+    elif callback_data.startswith("add_tag:"):
+        _, link_id = callback_data.split(":")
+        send_message(chat_id, f"Send the new tag for the link ID {link_id}")
+
+    return jsonify({"status": "ok"}), 200
+
+def _add_tag_to_link(link_id, tag_name):
+    """Add a tag to a specific link."""
+    link = UserLink.query.get(link_id)
+    if not link:
+        raise ValueError("Link not found")
+
+    tag = Tag.query.filter_by(name=tag_name).first()
+    if not tag:
+        tag = Tag(name=tag_name)
+        db.session.add(tag)
+
+    if tag not in link.tags:
+        link.tags.append(tag)
+        db.session.commit()
+
+def send_message_with_buttons(chat_id, text, buttons):
+    """Send a message with inline keyboard buttons."""
+    url = TELEGRAM_API_URL + "sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text,
+        "reply_markup": buttons.to_json()
+    }
+    requests.post(url, json=payload)
 
 # Database Management
 @app.route("/create_db", methods=["GET"])
