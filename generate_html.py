@@ -267,9 +267,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     </head>
     <body>
         <div class="container">
-            <div class="profile">
-                <h2>{first_name}'s Bookmarks</h2>
-            </div>
             {generate_tag_filters()}
             <div class="bookmarks">
                 {generate_bookmark_cards()}
