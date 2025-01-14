@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def generate_html(chat_id, user_links, link_metadata, first_name):
     """Generate a mobile-friendly HTML file with link history and metadata."""
@@ -90,8 +90,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: normal;
-                word-wrap: break-word; /* Prevent overflow */
-                max-width: 100%; /* Ensure the title doesn't exceed the card width */
+                word-wrap: break-word;
+                max-width: 100%;
             }
             .bookmark h3 a {
                 text-decoration: none;
@@ -124,40 +124,40 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 border-radius: 12px;
                 display: inline-block;
             }
+            .add-tag {
+                background-color: #d4edda;
+                color: #155724;
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+                cursor: pointer;
+                border: 1px solid #c3e6cb;
+            }
         </style>
         """
-
-
-    def generate_tag_filters():
-        filters_html = '<div class="filters">'
-        filters_html += '<span class="filter active" onclick="filterByTag(\'all\')">All</span>'
-        for tag in all_tags:
-            filters_html += f'<span class="filter" onclick="filterByTag(\'{tag}\')">{tag}</span>'
-        filters_html += '</div>'
-        return filters_html
 
     def generate_bookmark_cards():
         cards_html = ""
         current_time = datetime.now()
-    
+
         for link, metadata in zip(user_links, link_metadata):
             # Handle images
             images = metadata.get("images", [])
             image_html = f'<img src="{images[0]}" alt="Image">' if images else ""
-    
+
             # Format price if available
             price = metadata.get("price", None)
             price_html = f'<p class="price">Price: ${price}</p>' if price and price != "N/A" else ""
-    
+
             # Handle tags
             tags = metadata.get("tags", [])
             tags_html = (
                 '<div class="tags">' +
                 "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+                f'<span class="add-tag" onclick="openTagDialog({link.id})">+</span>' +
                 "</div>"
-                if tags else ""
             )
-    
+
             # Format creation time
             created_at = metadata.get("created_at")
             created_at_html = ""
@@ -170,7 +170,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 else:
                     formatted_time = f"{days_difference} days ago"
                 created_at_html = f'<p style="text-align: right; font-size: 0.8rem; color: #888;">{formatted_time}</p>'
-    
+
             # Generate card
             tags_attr = " ".join(tags)
             cards_html += f"""
@@ -184,7 +184,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     {created_at_html}
                 </div>
             </div>
-
             """
         return cards_html
 
@@ -209,6 +208,30 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }
                 });
             }
+
+            function openTagDialog(linkId) {
+                const existingTags = [...new Set(document.querySelectorAll('.tag'))].map(tag => tag.textContent.trim());
+                const newTag = prompt("Add a tag or choose one from the list:\n" + existingTags.join("\n"));
+                if (newTag) {
+                    // Send the new tag to the backend
+                    fetch(`/add_tag`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ link_id: linkId, tag: newTag })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Tag added successfully!');
+                            location.reload();
+                        } else {
+                            alert('Failed to add tag.');
+                        }
+                    });
+                }
+            }
         </script>
         """
 
@@ -227,7 +250,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="profile">
                 <h2>{first_name}'s Bookmarks</h2>
             </div>
-            {generate_tag_filters()}
             <div class="bookmarks">
                 {generate_bookmark_cards()}
             </div>
@@ -243,4 +265,3 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
-
