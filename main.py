@@ -346,6 +346,32 @@ def delete_link(link_id):
 
     return jsonify({"message": "Link deleted successfully!"}), 200
 
+@app.route("/delete_all/<string:chat_id>", methods=["DELETE"])
+def delete_all_links_and_tags(chat_id):
+    # Fetch all links for the chat ID
+    links = UserLink.query.filter_by(chat_id=chat_id).all()
+    if not links:
+        return jsonify({"error": "No links found for this chat ID"}), 404
+
+    # Delete all links and associated tags
+    for link in links:
+        db.session.delete(link)
+
+    # Commit the deletions
+    db.session.commit()
+
+    # Optionally clear unused tags
+    unused_tags = Tag.query.filter(~Tag.links.any()).all()
+    for tag in unused_tags:
+        db.session.delete(tag)
+
+    db.session.commit()
+
+    # Regenerate the HTML file for the user with no links
+    first_name = "User"  # Replace with logic to fetch the user's name, if available
+    generate_html(chat_id, [], [], first_name)
+
+    return jsonify({"message": "All links and tags deleted successfully!"}), 200
 
 # Database Management
 @app.route("/create_db", methods=["GET"])
