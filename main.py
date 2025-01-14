@@ -144,9 +144,15 @@ def _extract_opengraph_tags(soup, link):
 def webhook():
     """Handle Telegram webhook messages."""
     data = request.get_json()
+
+    # Check if it's a callback query
+    if "callback_query" in data:
+        return callback()
+
     if "message" not in data:
         return jsonify({"status": "ignored"}), 200
 
+    # Handle standard messages
     chat_id, first_name, text = _parse_message(data)
     if not text or not text.startswith("http"):
         send_message(chat_id, "Please send a valid link.")
@@ -164,6 +170,7 @@ def webhook():
     inline_keyboard = generate_inline_keyboard(link_id, existing_tags)
     send_message_with_buttons(chat_id, "Tag this link:", inline_keyboard)
     return jsonify({"status": "ok"}), 200
+
 
 def generate_inline_keyboard(link_id, existing_tags):
     """Generate inline keyboard with existing tags and an option to add a new tag."""
