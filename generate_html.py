@@ -58,8 +58,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }
             .bookmark {
                 background-color: #fff;
-                border: 1px solid #ddd;
-                border-radius: 8px;
                 padding: 16px;
                 display: flex;
                 align-items: flex-start;
