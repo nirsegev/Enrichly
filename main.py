@@ -311,6 +311,15 @@ def add_tag(link_id):
 
     return jsonify({"message": "Tag added successfully!"}), 200
 
+@app.route("/delete_link/<int:link_id>", methods=["DELETE"])
+def delete_link(link_id):
+    link = UserLink.query.get(link_id)
+    if not link:
+        return jsonify({"error": "Link not found"}), 404
+
+    db.session.delete(link)
+    db.session.commit()
+    return jsonify({"message": "Link deleted successfully!"}), 200
 
 
 # Database Management
