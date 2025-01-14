@@ -317,8 +317,33 @@ def delete_link(link_id):
     if not link:
         return jsonify({"error": "Link not found"}), 404
 
+    # Get chat_id and first_name from the link data
+    chat_id = link.chat_id
+    first_name = "User"  # Replace with logic to fetch the first name if available
+
+    # Delete the link
     db.session.delete(link)
     db.session.commit()
+
+    # Fetch updated user links and metadata
+    user_links = UserLink.query.filter_by(chat_id=chat_id).order_by(UserLink.created_at.desc()).all()
+    link_metadata = [
+        {
+            "title": l.title,
+            "description": l.description,
+            "url": l.url,
+            "price": l.price,
+            "images": l.images if isinstance(l.images, list) else l.images.split(","),
+            "site_name": l.site_name,
+            "tags": [tag.name for tag in l.tags],
+            "created_at": l.created_at,
+        }
+        for l in user_links
+    ]
+
+    # Regenerate the HTML file
+    generate_html(chat_id, user_links, link_metadata, first_name)
+
     return jsonify({"message": "Link deleted successfully!"}), 200
 
 
