@@ -266,6 +266,29 @@ def get_links_by_tags(chat_id):
         for link in links
     ])
 
+@app.route("/add_tag/<int:link_id>", methods=["POST"])
+def add_tag(link_id):
+    data = request.get_json()
+    tag_name = data.get("tag")
+
+    if not tag_name:
+        return jsonify({"error": "Tag name is required"}), 400
+
+    link = UserLink.query.get(link_id)
+    if not link:
+        return jsonify({"error": "Link not found"}), 404
+
+    tag = Tag.query.filter_by(name=tag_name).first()
+    if not tag:
+        tag = Tag(name=tag_name)
+        db.session.add(tag)
+
+    link.tags.append(tag)
+    db.session.commit()
+
+    return jsonify({"message": "Tag added successfully!"}), 200
+
+
 # Database Management
 @app.route("/create_db", methods=["GET"])
 def create_db():
