@@ -201,11 +201,11 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             function filterByTag(tag) {
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
-    
+        
                 // Update active filter
                 filters.forEach(filter => filter.classList.remove('active'));
                 document.querySelector(`.filter[onclick="filterByTag('${tag}')"]`).classList.add('active');
-    
+        
                 // Filter bookmarks
                 bookmarks.forEach(bookmark => {
                     const tags = bookmark.getAttribute('data-tags').split(' ');
@@ -216,12 +216,12 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }
                 });
             }
-    
+        
             function openTagDialog(linkId) {
                 // Prompt the user for a tag
                 const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
                 let tag = prompt(`Add a tag for link ID ${linkId}:\n\nExisting tags:\n${existingTags.join(', ')}`, "");
-    
+        
                 // If a tag was entered, send it to the server
                 if (tag) {
                     fetch(`/add_tag/${linkId}`, {
@@ -231,10 +231,16 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         },
                         body: JSON.stringify({ tag: tag })
                     })
-                    .then(response => {
-                        if (response.ok) {
-                            alert("Tag added successfully!");
-                            location.reload(); // Reload the page to update the UI
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === "Tag added successfully!") {
+                            // Find the card and update its tags
+                            const bookmark = document.querySelector(`.bookmark[data-id="${linkId}"]`);
+                            if (bookmark) {
+                                const tagsContainer = bookmark.querySelector('.tags');
+                                const newTagHtml = `<span class="tag">${tag}</span>`;
+                                tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
+                            }
                         } else {
                             alert("Failed to add tag.");
                         }
