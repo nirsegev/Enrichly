@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 # Initialize Flask App
