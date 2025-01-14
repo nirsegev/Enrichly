@@ -248,6 +248,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         });
                 }
             }
+
         </script>
         """
 
