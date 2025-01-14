@@ -5,6 +5,8 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -137,9 +139,6 @@ def _extract_opengraph_tags(soup, link):
     }
 
 # Telegram Bot Endpoints
-@app.route("/webhook", methods=["POST"])
-from flask import Flask, request, jsonify
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
