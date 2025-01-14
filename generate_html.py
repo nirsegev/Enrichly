@@ -65,6 +65,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 align-items: flex-start;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 transition: transform 0.2s;
+                position: relative;
             }
             .bookmark:hover {
                 transform: translateY(-5px);
@@ -133,6 +134,18 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 cursor: pointer;
                 border: 1px solid #c3e6cb;
             }
+            .delete-link {
+                position: absolute;
+                bottom: 8px;
+                left: 8px;
+                background-color: #ffdddd;
+                color: #b00;
+                padding: 4px 8px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+                cursor: pointer;
+                border: 1px solid #ffaaaa;
+            }
         </style>
         """
 
@@ -182,7 +195,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             # Generate card
             tags_attr = " ".join(tags)
             cards_html += f"""
-           <div class="bookmark" data-tags="{tags_attr}">
+            <div class="bookmark" data-tags="{tags_attr}" data-id="{link.id}">
                 {image_html}
                 <div class="bookmark-content">
                     <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:100]}</a></h3>
@@ -191,6 +204,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     {tags_html}
                     {created_at_html}
                 </div>
+                <span class="delete-link" onclick="deleteLink({link.id})">🗑️</span>
             </div>
             """
         return cards_html
@@ -201,11 +215,11 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             function filterByTag(tag) {
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
-        
+    
                 // Update active filter
                 filters.forEach(filter => filter.classList.remove('active'));
                 document.querySelector(`.filter[onclick="filterByTag('${tag}')"]`).classList.add('active');
-        
+    
                 // Filter bookmarks
                 bookmarks.forEach(bookmark => {
                     const tags = bookmark.getAttribute('data-tags').split(' ');
@@ -216,44 +230,26 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }
                 });
             }
-        
-            function openTagDialog(linkId) {
-                // Prompt the user for a tag
-                const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
-                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
-        
-                // If a tag was entered, send it to the server
-                if (tag) {
-                    fetch(`/add_tag/${linkId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ tag: tag })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Tag added successfully!") {
-                            // Find the card and update its tags
-                            const bookmark = document.querySelector(`.bookmark[data-id="${linkId}"]`);
-                            if (bookmark) {
-                                const tagsContainer = bookmark.querySelector('.tags');
-                                const newTagHtml = `<span class="tag">${tag}</span>`;
-                                tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
+    
+            function deleteLink(linkId) {
+                if (confirm("Are you sure you want to delete this link?")) {
+                    fetch(`/delete_link/${linkId}`, { method: "DELETE" })
+                        .then(response => {
+                            if (response.ok) {
+                                alert("Link deleted successfully!");
+                                location.reload(); // Reload the page to update the UI
+                            } else {
+                                alert("Failed to delete the link.");
                             }
-                        } else {
-                            alert("Failed to add tag.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error adding tag:", error);
-                        alert("An error occurred while adding the tag.");
-                    });
+                        })
+                        .catch(error => {
+                            console.error("Error deleting link:", error);
+                            alert("An error occurred while deleting the link.");
+                        });
                 }
             }
         </script>
         """
-
 
     # Build HTML
     history_html = f"""
@@ -283,4 +279,5 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
 
