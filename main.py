@@ -5,7 +5,6 @@ from flask import Flask, request, jsonify, send_from_directory, Response
 from generate_html import generate_html
 from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
-from ..models import UserLink, Tag
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -27,43 +26,43 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your-telegram-bot-token")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 X_SOAX_API_Secret = os.getenv("X-SOAX-API-Secret", "your-soax-token")
 
-# Database Models
-#link_tags = db.Table(
-#    'link_tags',
-#    db.Column('link_id', db.Integer, db.ForeignKey('user_links.id'), primary_key=True),
-#    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
-#)
+ Database Models
+link_tags = db.Table(
+    'link_tags',
+    db.Column('link_id', db.Integer, db.ForeignKey('user_links.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
 
-#class UserLink(db.Model):
-#    __tablename__ = 'user_links'
+class UserLink(db.Model):
+    __tablename__ = 'user_links'
 
-#    id = db.Column(db.Integer, primary_key=True)
-#    chat_id = db.Column(db.String, nullable=False)  # Telegram chat ID
-#    link = db.Column(db.String, nullable=False)
-#    title = db.Column(db.String, nullable=True)
-#    description = db.Column(db.Text, nullable=True)
-#    url = db.Column(db.String, nullable=True)
-#    price = db.Column(db.String, nullable=True)
-#    images = db.Column(db.JSON, nullable=True)  # Store as JSON
-#    site_name = db.Column(db.String, nullable=True)
-#    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
+    id = db.Column(db.Integer, primary_key=True)
+    chat_id = db.Column(db.String, nullable=False)  # Telegram chat ID
+    link = db.Column(db.String, nullable=False)
+    title = db.Column(db.String, nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    url = db.Column(db.String, nullable=True)
+    price = db.Column(db.String, nullable=True)
+    images = db.Column(db.JSON, nullable=True)  # Store as JSON
+    site_name = db.Column(db.String, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
-#    tags = db.relationship('Tag', secondary=link_tags, back_populates='links')
+    tags = db.relationship('Tag', secondary=link_tags, back_populates='links')
 
-#    def __repr__(self):
-#        return f"<UserLink {self.title}>"
+    def __repr__(self):
+        return f"<UserLink {self.title}>"
 
 
-#class Tag(db.Model):
-#    __tablename__ = 'tags'
+class Tag(db.Model):
+    __tablename__ = 'tags'
 
-#    id = db.Column(db.Integer, primary_key=True)
-#    name = db.Column(db.String, nullable=False, unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
 
-#    links = db.relationship('UserLink', secondary=link_tags, back_populates='tags')
+    links = db.relationship('UserLink', secondary=link_tags, back_populates='tags')
 
-#    def __repr__(self):
-#        return f"<Tag {self.name}>"
+    def __repr__(self):
+        return f"<Tag {self.name}>"
 
 # Utility Functions
 def analyze_link(link):
