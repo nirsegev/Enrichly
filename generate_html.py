@@ -139,9 +139,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 color: #b00;
                 padding: 4px 8px;
                 font-size: 0.8rem;
-                border-radius: 12px;
                 cursor: pointer;
-                border: 1px solid #ffaaaa;
             }
         </style>
         """
