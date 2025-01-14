@@ -138,7 +138,6 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 position: absolute;
                 bottom: 8px;
                 left: 8px;
-                background-color: #ffdddd;
                 color: #b00;
                 padding: 4px 8px;
                 font-size: 0.8rem;
