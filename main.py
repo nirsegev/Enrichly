@@ -26,7 +26,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "your-telegram-bot-token")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/"
 X_SOAX_API_Secret = os.getenv("X-SOAX-API-Secret", "your-soax-token")
 
- Database Models
+# Database Models
 link_tags = db.Table(
     'link_tags',
     db.Column('link_id', db.Integer, db.ForeignKey('user_links.id'), primary_key=True),
