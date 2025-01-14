@@ -141,6 +141,20 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 font-size: 0.8rem;
                 cursor: pointer;
             }
+            .delete-all {
+                background-color: #f8d7da;
+                color: #721c24;
+                padding: 10px 20px;
+                border: 1px solid #f5c6cb;
+                border-radius: 8px;
+                cursor: pointer;
+                margin-top: 16px;
+                display: block;
+                text-align: center;
+            }
+            .delete-all:hover {
+                background-color: #f5c6cb;
+            }
         </style>
         """
 
@@ -277,7 +291,24 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         });
                 }
             }
-
+            function deleteAllLinks() {
+                if (confirm("Are you sure you want to delete all links and tags? This action cannot be undone.")) {
+                    fetch(`/delete_all/${chatId}`, { method: "DELETE" })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === "All links and tags deleted successfully!") {
+                                alert(data.message);
+                                location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                alert(data.error || "Failed to delete all links.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error deleting all links:", error);
+                            alert("An error occurred while deleting all links and tags.");
+                        });
+                }
+            }
         </script>
         """
 
@@ -296,6 +327,9 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             {generate_tag_filters()}
             <div class="bookmarks">
                 {generate_bookmark_cards()}
+            </div>
+            <div class="actions">
+                <button class="delete-all" onclick="deleteAllLinks()">Delete All Links</button>
             </div>
         </div>
         {generate_scripts()}
