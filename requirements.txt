@@ -10,3 +10,4 @@ beautifulsoup4
 sqlalchemy>=1.4,<2.0  # Ensures compatibility with Flask-SQLAlchemy 2.5.1
 psycopg2>=2.9.0  # PostgreSQL adapter
 flask_sqlalchemy==2.5.1  # Works with SQLAlchemy < 2.0
+pyTelegramBotAPI
