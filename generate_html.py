@@ -136,6 +136,14 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         </style>
         """
 
+    def generate_tag_filters():
+        filters_html = '<div class="filters">'
+        filters_html += '<span class="filter active" onclick="filterByTag(\'all\')">All</span>'
+        for tag in all_tags:
+            filters_html += f'<span class="filter" onclick="filterByTag(\'{tag}\')">{tag}</span>'
+        filters_html += '</div>'
+        return filters_html
+
     def generate_bookmark_cards():
         cards_html = ""
         current_time = datetime.now()
@@ -256,6 +264,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             <div class="profile">
                 <h2>{first_name}'s Bookmarks</h2>
             </div>
+            {generate_tag_filters()}
             <div class="bookmarks">
                 {generate_bookmark_cards()}
             </div>
@@ -271,3 +280,4 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         file.write(history_html)
 
     return f"https://flask-production-4c83.up.railway.app/storage/links_history/{chat_id}_history.html"
+
