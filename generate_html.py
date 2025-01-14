@@ -218,9 +218,11 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             """
         return cards_html
 
-    def generate_scripts():
-        return """
+    def generate_scripts(chat_id):
+        return f"""
         <script>
+            const chatId = "{chat_id}";
+    
             function filterByTag(tag) {
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
@@ -239,58 +241,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }
                 });
             }
-            function openTagDialog(linkId) {
-                // Prompt the user for a tag
-                const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
-                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
-        
-                // If a tag was entered, send it to the server
-                if (tag) {
-                    fetch(`/add_tag/${linkId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ tag: tag })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Tag added successfully!") {
-                            // Find the card and update its tags
-                            const bookmark = document.querySelector(`.bookmark[data-id="${linkId}"]`);
-                            if (bookmark) {
-                                const tagsContainer = bookmark.querySelector('.tags');
-                                const newTagHtml = `<span class="tag">${tag}</span>`;
-                                tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
-                            }
-                        } else {
-                            alert("Failed to add tag.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error adding tag:", error);
-                        alert("An error occurred while adding the tag.");
-                    });
-                }
-            }
     
-            function deleteLink(linkId) {
-                if (confirm("Are you sure you want to delete this link?")) {
-                    fetch(`/delete_link/${linkId}`, { method: "DELETE" })
-                        .then(response => {
-                            if (response.ok) {
-                                alert("Link deleted successfully!");
-                                location.reload(); // Reload the page to update the UI
-                            } else {
-                                alert("Failed to delete the link.");
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error deleting link:", error);
-                            alert("An error occurred while deleting the link.");
-                        });
-                }
-            }
             function deleteAllLinks() {
                 if (confirm("Are you sure you want to delete all links and tags? This action cannot be undone.")) {
                     fetch(`/delete_all/${chatId}`, { method: "DELETE" })
@@ -309,8 +260,41 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         });
                 }
             }
+    
+            function openTagDialog(linkId) {
+                const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
+                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
+    
+                if (tag) {
+                    fetch(`/add_tag/${linkId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ tag: tag })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === "Tag added successfully!") {
+                            const bookmark = document.querySelector(`.bookmark[data-id="${linkId}"]`);
+                            if (bookmark) {
+                                const tagsContainer = bookmark.querySelector('.tags');
+                                const newTagHtml = `<span class="tag">${tag}</span>`;
+                                tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
+                            }
+                        } else {
+                            alert("Failed to add tag.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error adding tag:", error);
+                        alert("An error occurred while adding the tag.");
+                    });
+                }
+            }
         </script>
         """
+
 
     # Build HTML
     history_html = f"""
@@ -332,7 +316,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 <button class="delete-all" onclick="deleteAllLinks()">Delete All Links</button>
             </div>
         </div>
-        {generate_scripts()}
+        {generate_scripts(chat_id)}
     </body>
     </html>
     """
