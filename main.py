@@ -174,11 +174,15 @@ def webhook():
 
 def generate_inline_keyboard(link_id, existing_tags):
     """Generate inline keyboard with existing tags and an option to add a new tag."""
-    keyboard = [
+    if not link_id:
+        raise ValueError("link_id cannot be None")
+    
+    buttons = [
         [InlineKeyboardButton(tag, callback_data=f"tag:{link_id}:{tag}") for tag in existing_tags],
         [InlineKeyboardButton("Add New Tag", callback_data=f"add_tag:{link_id}")]
     ]
-    return InlineKeyboardMarkup(keyboard)
+    return InlineKeyboardMarkup(buttons)
+
 
 
 def _parse_message(data):
@@ -396,26 +400,29 @@ def delete_all_links_and_tags(chat_id):
 @app.route("/callback", methods=["POST"])
 def callback():
     """Handle callback queries from Telegram inline buttons."""
-    print("tag callback was called")
     data = request.get_json()
+    print("Callback data received:", data)  # Debugging line
+
     callback_query = data.get("callback_query")
     if not callback_query:
+        print("No callback_query found")  # Debugging line
         return jsonify({"status": "ignored"}), 200
-    print("callback middle")
-    chat_id = callback_query["message"]["chat"]["id"]
+
     callback_data = callback_query["data"]
-    message_id = callback_query["message"]["message_id"]
+    print("Callback data content:", callback_data)  # Debugging line
 
     if callback_data.startswith("tag:"):
         _, link_id, tag_name = callback_data.split(":")
+        print(f"Parsed link_id: {link_id}, tag_name: {tag_name}")  # Debugging line
         _add_tag_to_link(link_id, tag_name)
-        send_message(chat_id, f"Tag '{tag_name}' added to the link!")
-
+        send_message(callback_query["message"]["chat"]["id"], f"Tag '{tag_name}' added to the link!")
     elif callback_data.startswith("add_tag:"):
         _, link_id = callback_data.split(":")
-        send_message(chat_id, f"Send the new tag for the link ID {link_id}")
+        print(f"Parsed link_id for adding a new tag: {link_id}")  # Debugging line
+        send_message(callback_query["message"]["chat"]["id"], f"Send the new tag for the link ID {link_id}")
 
     return jsonify({"status": "ok"}), 200
+
 
 def _add_tag_to_link(link_id, tag_name):
     """Add a tag to a specific link."""
