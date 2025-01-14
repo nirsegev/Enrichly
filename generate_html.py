@@ -220,7 +220,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             function openTagDialog(linkId) {
                 // Prompt the user for a tag
                 const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
-                let tag = prompt(`Add a tag for link ID ${linkId}:\n\nExisting tags:\n${existingTags.join(', ')}`, "");
+                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
         
                 // If a tag was entered, send it to the server
                 if (tag) {
