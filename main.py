@@ -389,11 +389,12 @@ def delete_all_links_and_tags(chat_id):
 @app.route("/callback", methods=["POST"])
 def callback():
     """Handle callback queries from Telegram inline buttons."""
+    print("tag callback was called")
     data = request.get_json()
     callback_query = data.get("callback_query")
     if not callback_query:
         return jsonify({"status": "ignored"}), 200
-
+    print("callback middle")
     chat_id = callback_query["message"]["chat"]["id"]
     callback_data = callback_query["data"]
     message_id = callback_query["message"]["message_id"]
