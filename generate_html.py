@@ -223,77 +223,78 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
         <script>
             const chatId = "{chat_id}";
     
-            function filterByTag(tag) {
+            function filterByTag(tag) {{
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
     
                 // Update active filter
                 filters.forEach(filter => filter.classList.remove('active'));
-                document.querySelector(`.filter[onclick="filterByTag('${tag}')"]`).classList.add('active');
+                document.querySelector(`.filter[onclick="filterByTag('${{tag}}')"]`).classList.add('active');
     
                 // Filter bookmarks
-                bookmarks.forEach(bookmark => {
+                bookmarks.forEach(bookmark => {{
                     const tags = bookmark.getAttribute('data-tags').split(' ');
-                    if (tag === 'all' || tags.includes(tag)) {
+                    if (tag === 'all' || tags.includes(tag)) {{
                         bookmark.style.display = 'flex';
-                    } else {
+                    }} else {{
                         bookmark.style.display = 'none';
-                    }
-                });
-            }
+                    }}
+                }});
+            }}
     
-            function deleteAllLinks() {
-                if (confirm("Are you sure you want to delete all links and tags? This action cannot be undone.")) {
-                    fetch(`/delete_all/${chatId}`, { method: "DELETE" })
+            function deleteAllLinks() {{
+                if (confirm("Are you sure you want to delete all links and tags? This action cannot be undone.")) {{
+                    fetch(`/delete_all/${{chatId}}`, {{ method: "DELETE" }})
                         .then(response => response.json())
-                        .then(data => {
-                            if (data.message === "All links and tags deleted successfully!") {
+                        .then(data => {{
+                            if (data.message === "All links and tags deleted successfully!") {{
                                 alert(data.message);
                                 location.reload(); // Reload the page to reflect the changes
-                            } else {
+                            }} else {{
                                 alert(data.error || "Failed to delete all links.");
-                            }
-                        })
-                        .catch(error => {
+                            }}
+                        }})
+                        .catch(error => {{
                             console.error("Error deleting all links:", error);
                             alert("An error occurred while deleting all links and tags.");
-                        });
-                }
-            }
+                        }});
+                }}
+            }}
     
-            function openTagDialog(linkId) {
+            function openTagDialog(linkId) {{
                 const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
-                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
+                let tag = prompt(`Choose Existing tag:\n${{existingTags.join(', ')}}\n Or enter manually`, "");
     
-                if (tag) {
-                    fetch(`/add_tag/${linkId}`, {
+                if (tag) {{
+                    fetch(`/add_tag/${{linkId}}`, {{
                         method: "POST",
-                        headers: {
+                        headers: {{
                             "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ tag: tag })
-                    })
+                        }},
+                        body: JSON.stringify({{ tag: tag }})
+                    }})
                     .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Tag added successfully!") {
-                            const bookmark = document.querySelector(`.bookmark[data-id="${linkId}"]`);
-                            if (bookmark) {
+                    .then(data => {{
+                        if (data.message === "Tag added successfully!") {{
+                            const bookmark = document.querySelector(`.bookmark[data-id="${{linkId}}"]`);
+                            if (bookmark) {{
                                 const tagsContainer = bookmark.querySelector('.tags');
-                                const newTagHtml = `<span class="tag">${tag}</span>`;
+                                const newTagHtml = `<span class="tag">${{tag}}</span>`;
                                 tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
-                            }
-                        } else {
+                            }}
+                        }} else {{
                             alert("Failed to add tag.");
-                        }
-                    })
-                    .catch(error => {
+                        }}
+                    }})
+                    .catch(error => {{
                         console.error("Error adding tag:", error);
                         alert("An error occurred while adding the tag.");
-                    });
-                }
-            }
+                    }});
+                }}
+            }}
         </script>
         """
+
 
 
     # Build HTML
