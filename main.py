@@ -274,19 +274,43 @@ def add_tag(link_id):
     if not tag_name:
         return jsonify({"error": "Tag name is required"}), 400
 
+    # Fetch the link
     link = UserLink.query.get(link_id)
     if not link:
         return jsonify({"error": "Link not found"}), 404
 
+    # Fetch or create the tag
     tag = Tag.query.filter_by(name=tag_name).first()
     if not tag:
         tag = Tag(name=tag_name)
         db.session.add(tag)
 
-    link.tags.append(tag)
+    # Add the tag to the link
+    if tag not in link.tags:
+        link.tags.append(tag)
+
     db.session.commit()
 
+    # Regenerate the HTML for the user
+    chat_id = link.chat_id
+    user_links = UserLink.query.filter_by(chat_id=chat_id).order_by(UserLink.created_at.desc()).all()
+    link_metadata = [
+        {
+            "title": l.title,
+            "description": l.description,
+            "url": l.url,
+            "price": l.price,
+            "images": l.images if isinstance(l.images, list) else l.images.split(","),
+            "site_name": l.site_name,
+            "tags": [t.name for t in l.tags],
+            "created_at": l.created_at,
+        }
+        for l in user_links
+    ]
+    generate_html(chat_id, user_links, link_metadata, first_name="User")  # Regenerate the HTML file
+
     return jsonify({"message": "Tag added successfully!"}), 200
+
 
 
 # Database Management
