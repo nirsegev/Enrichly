@@ -202,7 +202,7 @@ def _save_link_to_db(chat_id, link, tags, metadata):
 def _generate_and_send_html(chat_id, first_name):
     """Generate HTML and send link history."""
     print("_generate_and_send_html")
-    user_links = UserLink.query.filter_by(chat_id=chat_id).all()
+    user_links = UserLink.query.filter_by(chat_id=chat_id).order_by(UserLink.created_at.desc()).all()
     link_metadata = [
         {
             "title": link.title,
