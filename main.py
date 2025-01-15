@@ -162,17 +162,28 @@ def webhook():
     link, tags = _extract_tags_from_text(text)
     metadata = analyze_link(link)
     if not metadata:
-        print("metadata couldn't be generated. stoping process")
- 
-    print("metadata exists, saving link to db")
+        print("Metadata couldn't be generated. Stopping process.")
+        send_message(chat_id, "Could not fetch metadata for the link. Please try another link.")
+        return jsonify({"status": "error"}), 200
+
+    print("Metadata exists, saving link to DB")
     link_id = _save_link_to_db(chat_id, link, tags, metadata)
-    print("link_id is: ", link_id)
+    print("Link ID is:", link_id)
+
+    # Regenerate the HTML
+    html_url = _generate_and_send_html(chat_id, first_name)
+
+    # Send confirmation message with link to the updated HTML
+    site_name = metadata.get("site_name", "The site")
+    send_message(chat_id, f"{site_name} link was saved. You can see it here: {html_url}")
 
     # Send tagging options
     existing_tags = [tag.name for tag in Tag.query.order_by(Tag.name).all()]
     inline_keyboard = generate_inline_keyboard(link_id, existing_tags)
     send_message_with_buttons(chat_id, "Tag this link:", inline_keyboard)
+
     return jsonify({"status": "ok"}), 200
+
 
 
 def generate_inline_keyboard(link_id, existing_tags, buttons_per_row=3):
@@ -237,7 +248,7 @@ def _save_link_to_db(chat_id, link, tags, metadata):
 
 
 def _generate_and_send_html(chat_id, first_name):
-    """Generate HTML and send link history."""
+    """Generate HTML and return the URL for the user's link list."""
     print("_generate_and_send_html")
     user_links = UserLink.query.filter_by(chat_id=chat_id).order_by(UserLink.created_at.desc()).all()
     link_metadata = [
@@ -254,6 +265,7 @@ def _generate_and_send_html(chat_id, first_name):
         for link in user_links
     ]
     return generate_html(chat_id, user_links, link_metadata, first_name)
+
 
 # Utility: Send message to Telegram
 def send_message(chat_id, text):
