@@ -298,6 +298,24 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }});
                 }}
             }}
+
+             function deleteLink(linkId) {
+                    if (confirm("Are you sure you want to delete this link?")) {
+                        fetch(`/delete_link/${linkId}`, { method: "DELETE" })
+                            .then(response => {
+                                if (response.ok) {
+                                    alert("Link deleted successfully!");
+                                    location.reload(); // Reload the page to update the UI
+                                } else {
+                                    alert("Failed to delete the link.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error deleting link:", error);
+                                alert("An error occurred while deleting the link.");
+                            });
+                    }
+                }
         </script>
         """
 
