@@ -183,8 +183,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             tags = metadata.get("tags", [])
             tags_html = (
                 '<div class="tags">' +
-                "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
                 f'<span class="add-tag" onclick="openTagDialog({link.id})">+</span>' +
+                "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
                 "</div>"
             )
     
