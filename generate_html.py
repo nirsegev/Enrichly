@@ -273,12 +273,12 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
             
                 if (tag) {{
-                    fetch(`/add_tag/${linkId}`, {{
+                    fetch(`/add_tag/${{linkId}}`, {{
                         method: "POST",
                         headers: {{
                             "Content-Type": "application/json"
                         }},
-                        body: JSON.stringify({ tag: tag })
+                        body: JSON.stringify({{ tag: tag }})
                     }})
                     .then(response => response.json())
                     .then(data => {{
