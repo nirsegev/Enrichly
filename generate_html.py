@@ -236,7 +236,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             
                 // Update active filter
                 filters.forEach(filter => filter.classList.remove('active'));
-                document.querySelector(`.filter[onclick="filterByTag('${tag}')"]`).classList.add('active');
+                document.querySelector(`.filter[onclick="filterByTag('${{tag}}')"]`).classList.add('active');
             
                 // Filter bookmarks
                 bookmarks.forEach(bookmark => {{
