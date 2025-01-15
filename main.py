@@ -161,10 +161,12 @@ def webhook():
     # Extract tags and analyze link
     link, tags = _extract_tags_from_text(text)
     metadata = analyze_link(link)
-    if metadata:
-        print("metadata exists, saving link to db")
-        link_id = _save_link_to_db(chat_id, link, tags, metadata)
-        print("link_id is: ", link_id)
+    if not metadata:
+        print("metadata couldn't be generated. stoping process")
+ 
+    print("metadata exists, saving link to db")
+    link_id = _save_link_to_db(chat_id, link, tags, metadata)
+    print("link_id is: ", link_id)
 
     # Send tagging options
     existing_tags = [tag.name for tag in Tag.query.order_by(Tag.name).all()]
