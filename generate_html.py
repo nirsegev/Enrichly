@@ -289,7 +289,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                                 const newTagHtml = `<span class="tag">${{tag}}</span>`;
                                 tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
                             }}
-                            refreshFiltersBar(); // Refresh the filters bar dynamically
+                            refreshFiltersBar(tag); // Refresh the filters bar dynamically
                         }} else {{
                             alert("Failed to add tag.");
                         }}
@@ -301,7 +301,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 }}   
             }}
                         
-            function refreshFiltersBar() {{
+            function refreshFiltersBar( tag) {{
                 // Fetch updated tags from the server
                 fetch(`/get_tags/${{chatId}}`)
                     .then(response => response.json())
@@ -311,7 +311,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                             // Rebuild filters bar
                             let filtersHtml = '<span class="filter active" onclick="filterByTag(\'all\')">All</span>';
                             tags.forEach(tag => {{
-                                filtersHtml += `<span class="filter" onclick="filterByTag('${tag}')">${{tag}}</span>`;
+                                filtersHtml += `<span class="filter" onclick="filterByTag('${{tag}}')">${{tag}}</span>`;
                         }});
                             filtersContainer.innerHTML = filtersHtml; // Update the filters dynamically
                         }}
