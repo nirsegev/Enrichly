@@ -248,24 +248,25 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }}
     
             // Refresh the filters bar dynamically
-            function refreshFiltersBar(tag) {{
+            function refreshFiltersBar(tag) {
                 fetch(`/get_tags/${{chatId}}`)
                     .then(response => response.json())
                     .then(tags => {{
                         const filtersContainer = document.querySelector('.filters');
                         if (filtersContainer) {{
                             // Rebuild filters bar
-                            let filtersHtml = '<span class="filter active" onclick="filterByTag(\'all\')">All</span>';
+                            let filtersHtml = '<span class="filter active" onclick="filterByTag(&quot;all&quot;)">All</span>';
                             tags.forEach(tag => {{
-                                filtersHtml += `<span class="filter" onclick="filterByTag('${{tag}}')">${{tag}}</span>`;
-                            }});
+                                filtersHtml += `<span class="filter" onclick="filterByTag(&quot;${tag}&quot;)">${{tag}}</span>`;
+                            });
                             filtersContainer.innerHTML = filtersHtml;
-                        }}
-                    }})
+                        }
+                    })
                     .catch(error => {{
                         console.error("Error refreshing filters bar:", error);
                     }});
             }}
+
     
             // Define other functions
             function deleteAllLinks() {{
