@@ -314,8 +314,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                             console.error("Error deleting link:", error);
                             alert("An error occurred while deleting the link.");
                         }});
-                }
-            }
+                }}
+            }}
         </script>
         """
 
