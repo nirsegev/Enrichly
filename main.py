@@ -349,7 +349,7 @@ def add_tag(link_id):
             "description": l.description,
             "url": l.url,
             "price": l.price,
-            "images": l.images if isinstance(l.images, list) else l.images.split(","),
+            "images": l.images if isinstance(l.images, list) else (l.images.split(",") if l.images else []),
             "site_name": l.site_name,
             "tags": [t.name for t in l.tags],
             "created_at": l.created_at,
@@ -359,6 +359,7 @@ def add_tag(link_id):
     generate_html(chat_id, user_links, link_metadata, first_name="User")  # Regenerate the HTML file
 
     return jsonify({"message": "Tag added successfully!"}), 200
+
 
 @app.route("/delete_link/<int:link_id>", methods=["DELETE"])
 def delete_link(link_id):
