@@ -175,16 +175,22 @@ def webhook():
     return jsonify({"status": "ok"}), 200
 
 
-def generate_inline_keyboard(link_id, existing_tags):
+def generate_inline_keyboard(link_id, existing_tags, buttons_per_row=3):
     """Generate inline keyboard with existing tags and an option to add a new tag."""
-    if not link_id:
-        raise ValueError("link_id cannot be None")
-    
-    buttons = [
-        [InlineKeyboardButton(tag, callback_data=f"tag:{link_id}:{tag}") for tag in existing_tags],
-        [InlineKeyboardButton("Add New Tag", callback_data=f"add_tag:{link_id}")]
-    ]
-    return InlineKeyboardMarkup(buttons)
+    keyboard = []
+
+    # Group tags into rows with `buttons_per_row` buttons per row
+    for i in range(0, len(existing_tags), buttons_per_row):
+        row = [
+            InlineKeyboardButton(tag, callback_data=f"tag:{link_id}:{tag}") 
+            for tag in existing_tags[i:i + buttons_per_row]
+        ]
+        keyboard.append(row)
+
+    # Add a row for "Add New Tag" button
+    keyboard.append([InlineKeyboardButton("Add New Tag", callback_data=f"add_tag:{link_id}")])
+
+    return InlineKeyboardMarkup(keyboard)
 
 
 
