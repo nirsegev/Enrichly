@@ -257,7 +257,7 @@ def _generate_and_send_html(chat_id, first_name):
             "description": link.description,
             "url": link.url,
             "price": link.price,
-            "images": link.images if isinstance(link.images, list) else link.images.split(","),
+            "images": link.images if isinstance(link.images, list) else (link.images.split(",") if link.images else []),
             "site_name": link.site_name,
             "tags": [tag.name for tag in link.tags],
             "created_at": link.created_at,
