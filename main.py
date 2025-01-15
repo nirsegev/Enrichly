@@ -505,6 +505,18 @@ def send_message_with_buttons(chat_id, text, buttons):
     }
     requests.post(url, json=payload)
 
+@app.route('/get_tags/<chat_id>', methods=['GET'])
+def get_tags(chat_id):
+    try:
+        # Query all tags associated with the given chat_id
+        tags = Tag.query.join(UserLink.tags).filter(UserLink.chat_id == chat_id).with_entities(Tag.name).distinct().all()
+        tag_list = [tag.name for tag in tags]
+        return jsonify(tag_list), 200
+    except Exception as e:
+        print(f"Error fetching tags: {e}")
+        return jsonify({"error": "Failed to fetch tags"}), 500
+
+
 # Database Management
 @app.route("/create_db", methods=["GET"])
 def create_db():
