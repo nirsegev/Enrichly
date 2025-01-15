@@ -222,14 +222,12 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             """
         return cards_html
 
-
-
-
     def generate_scripts(chat_id):
         return f"""
         <script>
             const chatId = "{chat_id}";
     
+            // Define filterByTag function
             function filterByTag(tag) {{
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
@@ -249,6 +247,27 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                 }});
             }}
     
+            // Refresh the filters bar dynamically
+            function refreshFiltersBar(tag) {{
+                fetch(`/get_tags/${{chatId}}`)
+                    .then(response => response.json())
+                    .then(tags => {{
+                        const filtersContainer = document.querySelector('.filters');
+                        if (filtersContainer) {{
+                            // Rebuild filters bar
+                            let filtersHtml = '<span class="filter active" onclick="filterByTag(\'all\')">All</span>';
+                            tags.forEach(tag => {{
+                                filtersHtml += `<span class="filter" onclick="filterByTag('${{tag}}')">${{tag}}</span>`;
+                            }});
+                            filtersContainer.innerHTML = filtersHtml;
+                        }}
+                    }})
+                    .catch(error => {{
+                        console.error("Error refreshing filters bar:", error);
+                    }});
+            }}
+    
+            // Define other functions
             function deleteAllLinks() {{
                 if (confirm("Are you sure you want to delete all links and tags? This action cannot be undone.")) {{
                     fetch(`/delete_all/${{chatId}}`, {{ method: "DELETE" }})
@@ -298,29 +317,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         console.error("Error adding tag:", error);
                         alert("An error occurred while adding the tag.");
                     }});
-                }}   
+                }}
             }}
-                        
-            function refreshFiltersBar( tag) {{
-                // Fetch updated tags from the server
-                fetch(`/get_tags/${{chatId}}`)
-                    .then(response => response.json())
-                    .then(tags => {{
-                        const filtersContainer = document.querySelector('.filters');
-                        if (filtersContainer) {{
-                            // Rebuild filters bar
-                            let filtersHtml = '<span class="filter active" onclick="filterByTag(\'all\')">All</span>';
-                            tags.forEach(tag => {{
-                                filtersHtml += `<span class="filter" onclick="filterByTag('${{tag}}')">${{tag}}</span>`;
-                        }});
-                            filtersContainer.innerHTML = filtersHtml; // Update the filters dynamically
-                        }}
-                    }})
-                    .catch(error => {{
-                        console.error("Error refreshing filters bar:", error);
-                    }});
-            }}
-
     
             function deleteLink(linkId) {{
                 if (confirm("Are you sure you want to delete this link?")) {{
@@ -329,7 +327,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                             if (response.ok) {{
                                 alert("Link deleted successfully!");
                                 location.reload(); // Reload the page to update the UI
-                             }} else {{
+                            }} else {{
                                 alert("Failed to delete the link.");
                             }}
                         }})
