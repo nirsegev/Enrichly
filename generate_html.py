@@ -183,8 +183,8 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             tags = metadata.get("tags", [])
             tags_html = (
                 '<div class="tags">' +
-                f'<span class="add-tag" onclick="openTagDialog({link.id})">+</span>' +  # "+" button always at the end
                 "".join([f'<span class="tag">{tag}</span>' for tag in tags]) +
+                f'<span class="add-tag" onclick="openTagDialog({link.id})">+</span>' +
                 "</div>"
             )
     
@@ -201,13 +201,17 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     formatted_time = f"{days_difference} days ago"
                 created_at_html = f'<p style="text-align: right; font-size: 0.8rem; color: #888;">{formatted_time}</p>'
     
+            # Handle title safely
+            title = metadata.get('title', 'Untitled') or 'Untitled'
+            title = title[:100]  # Ensure it's a string and slice it safely
+    
             # Generate card
             tags_attr = " ".join(tags)
             cards_html += f"""
             <div class="bookmark" data-tags="{tags_attr}" data-id="{link.id}">
                 {image_html}
                 <div class="bookmark-content">
-                    <h3><a href="{metadata.get('url', link.link)}" target="_blank">{metadata.get('title', 'Untitled')[:100]}</a></h3>
+                    <h3><a href="{metadata.get('url', link.link)}" target="_blank">{title}</a></h3>
                     <p>{(metadata.get('description') or '')[:200] + ("..." if metadata.get('description') and len(metadata.get('description')) > 200 else "")}</p>
                     {price_html}
                     {tags_html}
@@ -217,6 +221,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             </div>
             """
         return cards_html
+
 
 
     def generate_scripts(chat_id):
