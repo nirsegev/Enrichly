@@ -202,7 +202,7 @@ def _extract_tags_from_text(text):
 
 def _save_link_to_db(chat_id, link, tags, metadata):
     """Save link and metadata to the database."""
-    print("saving link to db")
+    print("Saving link to database")
     user_link = UserLink(
         chat_id=chat_id,
         link=link,
@@ -223,6 +223,10 @@ def _save_link_to_db(chat_id, link, tags, metadata):
 
     db.session.add(user_link)
     db.session.commit()
+    print(f"Link saved with ID: {user_link.id}")  # Debugging line
+
+    return user_link.id
+
 
 def _generate_and_send_html(chat_id, first_name):
     """Generate HTML and send link history."""
