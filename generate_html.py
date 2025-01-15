@@ -319,7 +319,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     .catch(error => {{
                         console.error("Error refreshing filters bar:", error);
                     }});
-            }
+            }}
 
     
             function deleteLink(linkId) {{
