@@ -218,6 +218,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     {created_at_html}
                 </div>
                 <span class="delete-link" onclick="deleteLink({link.id})">🗑️</span>
+            
             </div>
             """
         return cards_html
@@ -298,10 +299,10 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     }});
                 }}
             }}
-
+    
             function deleteLink(linkId) {{
                 if (confirm("Are you sure you want to delete this link?")) {{
-                    fetch(`/delete_link/${linkId}`, {{ method: "DELETE" }})
+                    fetch(`/delete_link/${{linkId}}`, {{ method: "DELETE" }})
                         .then(response => {{
                             if (response.ok) {{
                                 alert("Link deleted successfully!");
@@ -318,6 +319,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }}
         </script>
         """
+
 
 
 
