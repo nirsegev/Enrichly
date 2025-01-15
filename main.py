@@ -435,19 +435,48 @@ def callback():
         return jsonify({"status": "ignored"}), 200
 
     callback_data = callback_query["data"]
+    chat_id = callback_query["message"]["chat"]["id"]
     print("Callback data content:", callback_data)  # Debugging line
 
     if callback_data.startswith("tag:"):
         _, link_id, tag_name = callback_data.split(":")
         print(f"Parsed link_id: {link_id}, tag_name: {tag_name}")  # Debugging line
+
+        # Add tag to the link
         _add_tag_to_link(link_id, tag_name)
-        send_message(callback_query["message"]["chat"]["id"], f"Tag '{tag_name}' added to the link!")
+
+        # Fetch the user's first name (if available)
+        first_name = "User"  # Replace with logic to fetch the user's first name if needed
+
+        # Regenerate and update the persisted HTML
+        user_links = UserLink.query.filter_by(chat_id=chat_id).order_by(UserLink.created_at.desc()).all()
+        link_metadata = [
+            {
+                "title": l.title,
+                "description": l.description,
+                "url": l.url,
+                "price": l.price,
+                "images": l.images if isinstance(l.images, list) else (l.images.split(",") if l.images else []),
+                "site_name": l.site_name,
+                "tags": [tag.name for tag in l.tags],
+                "created_at": l.created_at,
+            }
+            for l in user_links
+        ]
+        html_url = generate_html(chat_id, user_links, link_metadata, first_name)
+
+        # Notify the user
+        send_message(
+            chat_id,
+            f"Tag '{tag_name}' added to the link! You can see the updated list here: {html_url}"
+        )
     elif callback_data.startswith("add_tag:"):
         _, link_id = callback_data.split(":")
         print(f"Parsed link_id for adding a new tag: {link_id}")  # Debugging line
-        send_message(callback_query["message"]["chat"]["id"], f"Send the new tag for the link ID {link_id}")
+        send_message(chat_id, f"Send the new tag for the link ID {link_id}")
 
     return jsonify({"status": "ok"}), 200
+
 
 
 def _add_tag_to_link(link_id, tag_name):
