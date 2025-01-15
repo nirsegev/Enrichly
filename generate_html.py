@@ -258,10 +258,10 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                             let filtersHtml = '<span class="filter active" onclick="filterByTag(&quot;all&quot;)">All</span>';
                             tags.forEach(tag => {{
                                 filtersHtml += `<span class="filter" onclick="filterByTag(&quot;${{tag}}&quot;)">${{tag}}</span>`;
-                            });
+                            }});
                             filtersContainer.innerHTML = filtersHtml;
                         }}
-                    })
+                    }})
                     .catch(error => {{
                         console.error("Error refreshing filters bar:", error);
                     }});
