@@ -308,7 +308,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                                 const newTagHtml = `<span class="tag">${{tag}}</span>`;
                                 tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
                             }}
-                            refreshFiltersBar(); // Refresh the filters bar dynamically
+                            refreshFiltersBar(tag); // Refresh the filters bar dynamically
                         }} else {{
                             alert("Failed to add tag.");
                         }}
