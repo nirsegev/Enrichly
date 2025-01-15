@@ -270,15 +270,15 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
     
             function openTagDialog(linkId) {{
                 const existingTags = Array.from(document.querySelectorAll('.filter:not(.active)')).map(tag => tag.innerText);
-                let tag = prompt(`Choose Existing tag:\n${{existingTags.join(', ')}}\n Or enter manually`, "");
-    
+                let tag = prompt(`Choose Existing tag:\n${existingTags.join(', ')}\n Or enter manually`, "");
+            
                 if (tag) {{
-                    fetch(`/add_tag/${{linkId}}`, {{
+                    fetch(`/add_tag/${linkId}`, {{
                         method: "POST",
                         headers: {{
                             "Content-Type": "application/json"
                         }},
-                        body: JSON.stringify({{ tag: tag }})
+                        body: JSON.stringify({ tag: tag })
                     }})
                     .then(response => response.json())
                     .then(data => {{
@@ -289,6 +289,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                                 const newTagHtml = `<span class="tag">${{tag}}</span>`;
                                 tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
                             }}
+                            refreshFiltersBar(); // Refresh the filters bar dynamically
                         }} else {{
                             alert("Failed to add tag.");
                         }}
@@ -297,8 +298,29 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         console.error("Error adding tag:", error);
                         alert("An error occurred while adding the tag.");
                     }});
-                }}
+                }}   
             }}
+                        
+            function refreshFiltersBar() {{
+                // Fetch updated tags from the server
+                fetch(`/get_tags/${chatId}`)
+                    .then(response => response.json())
+                    .then(tags => {{
+                        const filtersContainer = document.querySelector('.filters');
+                        if (filtersContainer) {{
+                            // Rebuild filters bar
+                            let filtersHtml = '<span class="filter active" onclick="filterByTag(\'all\')">All</span>';
+                            tags.forEach(tag => {{
+                                filtersHtml += `<span class="filter" onclick="filterByTag('${tag}')">${{tag}}</span>`;
+                        }});
+                            filtersContainer.innerHTML = filtersHtml; // Update the filters dynamically
+                        }}
+                    }})
+                    .catch(error => {{
+                        console.error("Error refreshing filters bar:", error);
+                    }});
+            }
+
     
             function deleteLink(linkId) {{
                 if (confirm("Are you sure you want to delete this link?")) {{
