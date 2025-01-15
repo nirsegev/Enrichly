@@ -248,7 +248,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }}
     
             // Refresh the filters bar dynamically
-            function refreshFiltersBar(tag) {{
+            function refreshFiltersBar() {{
                 fetch(`/get_tags/${{chatId}}`)
                     .then(response => response.json())
                     .then(tags => {{
@@ -309,7 +309,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                                 const newTagHtml = `<span class="tag">${{tag}}</span>`;
                                 tagsContainer.insertAdjacentHTML('beforeend', newTagHtml);
                             }}
-                            refreshFiltersBar(tag); // Refresh the filters bar dynamically
+                            refreshFiltersBar(); // Refresh the filters bar dynamically
                         }} else {{
                             alert("Failed to add tag.");
                         }}
