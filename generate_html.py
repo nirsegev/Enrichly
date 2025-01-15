@@ -303,7 +303,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         
             function refreshFiltersBar() {{
                 // Fetch updated tags from the server
-                fetch(`/get_tags/${chatId}`)
+                fetch(`/get_tags/${{chatId}}`)
                     .then(response => response.json())
                     .then(tags => {{
                         const filtersContainer = document.querySelector('.filters');
