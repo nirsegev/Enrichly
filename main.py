@@ -383,7 +383,7 @@ def delete_link(link_id):
             "description": l.description,
             "url": l.url,
             "price": l.price,
-            "images": l.images if isinstance(l.images, list) else l.images.split(","),
+            "images": l.images if isinstance(l.images, list) else (l.images.split(",") if l.images else []),
             "site_name": l.site_name,
             "tags": [tag.name for tag in l.tags],
             "created_at": l.created_at,
