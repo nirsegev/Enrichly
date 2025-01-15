@@ -206,7 +206,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             title = title[:100]  # Ensure it's a string and slice it safely
     
             # Generate card
-            tags_attr = " ".join(tags)
+            tags_attr = "|".join(tags)  # Use pipe "|" as delimiter
             cards_html += f"""
             <div class="bookmark" data-tags="{tags_attr}" data-id="{link.id}">
                 {image_html}
@@ -218,10 +218,10 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                     {created_at_html}
                 </div>
                 <span class="delete-link" onclick="deleteLink({link.id})">🗑️</span>
-            
             </div>
             """
         return cards_html
+
 
 
 
@@ -233,19 +233,19 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             function filterByTag(tag) {{
                 const bookmarks = document.querySelectorAll('.bookmark');
                 const filters = document.querySelectorAll('.filter');
-    
+            
                 // Update active filter
                 filters.forEach(filter => filter.classList.remove('active'));
                 document.querySelector(`.filter[onclick="filterByTag('${{tag}}')"]`).classList.add('active');
-    
+            
                 // Filter bookmarks
                 bookmarks.forEach(bookmark => {{
-                    const tags = bookmark.getAttribute('data-tags').split(' ');
+                    const tags = bookmark.getAttribute('data-tags').split('|'); // Use pipe "|" as delimiter
                     if (tag === 'all' || tags.includes(tag)) {{
                         bookmark.style.display = 'flex';
                     }} else {{
                         bookmark.style.display = 'none';
-                    }}
+                    }
                 }});
             }}
     
