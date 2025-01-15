@@ -245,7 +245,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
                         bookmark.style.display = 'flex';
                     }} else {{
                         bookmark.style.display = 'none';
-                    }
+                    }}
                 }});
             }}
     
