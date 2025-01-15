@@ -248,7 +248,7 @@ def generate_html(chat_id, user_links, link_metadata, first_name):
             }}
     
             // Refresh the filters bar dynamically
-            function refreshFiltersBar() {{
+            function refreshFiltersBar(tag) {{
                 fetch(`/get_tags/${{chatId}}`)
                     .then(response => response.json())
                     .then(tags => {{
