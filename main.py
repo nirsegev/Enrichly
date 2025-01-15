@@ -435,7 +435,7 @@ def callback():
         return jsonify({"status": "ignored"}), 200
 
     callback_data = callback_query["data"]
-    chat_id = callback_query["message"]["chat"]["id"]
+    chat_id = str(callback_query["message"]["chat"]["id"])  # Ensure chat_id is a string
     print("Callback data content:", callback_data)  # Debugging line
 
     if callback_data.startswith("tag:"):
@@ -476,6 +476,7 @@ def callback():
         send_message(chat_id, f"Send the new tag for the link ID {link_id}")
 
     return jsonify({"status": "ok"}), 200
+
 
 
 
